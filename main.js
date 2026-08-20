@@ -98,6 +98,8 @@ function toggleSessionMusic(){
 
 function installSBS(scene){
   const renderer=scene.renderer,originalRender=renderer.render.bind(renderer),stereo=new THREE.StereoCamera(),size=new THREE.Vector2()
+  const appleMobile=/iPhone|iPad|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1)
+  const standalone=window.matchMedia('(display-mode: standalone)').matches||window.matchMedia('(display-mode: fullscreen)').matches||navigator.standalone===true
   let enabled=false
   stereo.aspect=.5;stereo.eyeSep=.064
   renderer.render=function(scene3D,camera){
@@ -110,12 +112,15 @@ function installSBS(scene){
   function setOverlay(visible){$('.hud').style.display=visible?'flex':'none';$('.orientation').style.display=visible?'flex':'none'}
   const fullscreenElement=()=>document.fullscreenElement||document.webkitFullscreenElement
   async function requestMotion(){if(typeof DeviceOrientationEvent!=='undefined'&&typeof DeviceOrientationEvent.requestPermission==='function')try{await DeviceOrientationEvent.requestPermission()}catch{}}
-  async function enterFullscreen(){document.body.classList.add('pseudo-fullscreen');const request=document.documentElement.requestFullscreen||document.documentElement.webkitRequestFullscreen;try{if(request)await request.call(document.documentElement,{navigationUI:'hide'})}catch{};try{await screen.orientation?.lock?.('landscape')}catch{};$('#enter-fullscreen').textContent='SAIR DA TELA CHEIA'}
+  function showAppleHint(){if(appleMobile&&!standalone)$('#ios-install-hint').classList.add('show')}
+  async function enterFullscreen(){if(appleMobile&&!standalone){showAppleHint();$('#enter-fullscreen').textContent='COMO USAR TELA CHEIA';return false}document.body.classList.add('pseudo-fullscreen');const request=document.documentElement.requestFullscreen||document.documentElement.webkitRequestFullscreen;try{if(request)await request.call(document.documentElement,{navigationUI:'hide'})}catch{};try{await screen.orientation?.lock?.('landscape')}catch{};const active=Boolean(fullscreenElement()||standalone);$('#enter-fullscreen').textContent=active?'SAIR DA TELA CHEIA':'MODO AMPLO';return active}
   async function leaveFullscreen(){document.body.classList.remove('pseudo-fullscreen');const exit=document.exitFullscreen||document.webkitExitFullscreen;try{if(fullscreenElement()&&exit)await exit.call(document)}catch{};try{screen.orientation?.unlock?.()}catch{};$('#enter-fullscreen').textContent='TELA CHEIA'}
   async function activate(){unlockSessionMusic();enabled=true;setOverlay(false);document.body.classList.add('sbs-active');await Promise.allSettled([requestMotion(),enterFullscreen()])}
   async function deactivate(){enabled=false;document.body.classList.remove('sbs-active');setOverlay(true);await leaveFullscreen()}
   $('#enter-vr').addEventListener('click',()=>{unlockSessionMusic();enabled?deactivate():activate()})
   $('#enter-fullscreen').addEventListener('click',async()=>{unlockSessionMusic();if(fullscreenElement()||document.body.classList.contains('pseudo-fullscreen'))await leaveFullscreen();else await enterFullscreen()})
+  $('#close-ios-hint').addEventListener('click',()=>$('#ios-install-hint').classList.remove('show'))
+  if(appleMobile&&!standalone){$('#enter-fullscreen').textContent='COMO USAR TELA CHEIA';showAppleHint()}
   ;['fullscreenchange','webkitfullscreenchange'].forEach(name=>document.addEventListener(name,()=>{$('#enter-fullscreen').textContent=fullscreenElement()||document.body.classList.contains('pseudo-fullscreen')?'SAIR DA TELA CHEIA':'TELA CHEIA'}))
   window.addEventListener('keydown',event=>{if(event.key==='Escape'&&enabled)deactivate()})
 }
