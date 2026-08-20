@@ -108,13 +108,15 @@ function installSBS(scene){
     renderer.setScissorTest(false);renderer.setViewport(0,0,size.x,size.y)
   }
   function setOverlay(visible){$('.hud').style.display=visible?'flex':'none';$('.orientation').style.display=visible?'flex':'none'}
+  const fullscreenElement=()=>document.fullscreenElement||document.webkitFullscreenElement
   async function requestMotion(){if(typeof DeviceOrientationEvent!=='undefined'&&typeof DeviceOrientationEvent.requestPermission==='function')try{await DeviceOrientationEvent.requestPermission()}catch{}}
-  async function enterFullscreen(){try{await document.documentElement.requestFullscreen?.({navigationUI:'hide'})}catch{};try{await screen.orientation?.lock?.('landscape')}catch{}}
-  async function activate(){unlockSessionMusic();await requestMotion();await enterFullscreen();enabled=true;setOverlay(false)}
-  async function deactivate(){enabled=false;setOverlay(true);try{screen.orientation?.unlock?.()}catch{};if(document.fullscreenElement)try{await document.exitFullscreen()}catch{}}
+  async function enterFullscreen(){document.body.classList.add('pseudo-fullscreen');const request=document.documentElement.requestFullscreen||document.documentElement.webkitRequestFullscreen;try{if(request)await request.call(document.documentElement,{navigationUI:'hide'})}catch{};try{await screen.orientation?.lock?.('landscape')}catch{};$('#enter-fullscreen').textContent='SAIR DA TELA CHEIA'}
+  async function leaveFullscreen(){document.body.classList.remove('pseudo-fullscreen');const exit=document.exitFullscreen||document.webkitExitFullscreen;try{if(fullscreenElement()&&exit)await exit.call(document)}catch{};try{screen.orientation?.unlock?.()}catch{};$('#enter-fullscreen').textContent='TELA CHEIA'}
+  async function activate(){unlockSessionMusic();enabled=true;setOverlay(false);document.body.classList.add('sbs-active');await Promise.allSettled([requestMotion(),enterFullscreen()])}
+  async function deactivate(){enabled=false;document.body.classList.remove('sbs-active');setOverlay(true);await leaveFullscreen()}
   $('#enter-vr').addEventListener('click',()=>{unlockSessionMusic();enabled?deactivate():activate()})
-  $('#enter-fullscreen').addEventListener('click',async()=>{unlockSessionMusic();if(document.fullscreenElement)await document.exitFullscreen();else await enterFullscreen()})
-  document.addEventListener('fullscreenchange',()=>{const fullscreen=Boolean(document.fullscreenElement);$('#enter-fullscreen').textContent=fullscreen?'SAIR DA TELA CHEIA':'TELA CHEIA';if(!fullscreen&&enabled){enabled=false;setOverlay(true)}})
+  $('#enter-fullscreen').addEventListener('click',async()=>{unlockSessionMusic();if(fullscreenElement()||document.body.classList.contains('pseudo-fullscreen'))await leaveFullscreen();else await enterFullscreen()})
+  ;['fullscreenchange','webkitfullscreenchange'].forEach(name=>document.addEventListener(name,()=>{$('#enter-fullscreen').textContent=fullscreenElement()||document.body.classList.contains('pseudo-fullscreen')?'SAIR DA TELA CHEIA':'TELA CHEIA'}))
   window.addEventListener('keydown',event=>{if(event.key==='Escape'&&enabled)deactivate()})
 }
 AFRAME.registerComponent('canvas-label',{

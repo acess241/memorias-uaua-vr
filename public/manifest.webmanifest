@@ -1,0 +1,11 @@
+{
+  "name": "Memórias de Uauá VR",
+  "short_name": "Uauá VR",
+  "start_url": "./",
+  "scope": "./",
+  "display": "fullscreen",
+  "orientation": "landscape",
+  "background_color": "#090706",
+  "theme_color": "#120d0a",
+  "description": "Museu imersivo sobre o patrimônio e a memória de Uauá."
+}
