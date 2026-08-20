@@ -50,19 +50,19 @@
       <!-- Iluminação arquitetural -->
       <a-light type="ambient" color="#8C765F" intensity="0.34"></a-light>
       <a-light type="hemisphere" color="#E7C89C" groundColor="#241610" intensity="0.55"></a-light>
-      <a-light type="point" color="#F4B65E" intensity="18" distance="16" decay="2" position="0 5.8 0"></a-light>
+      <a-light type="point" color="#F4B65E" intensity="18" distance="15" decay="2" position="0 5 0"></a-light>
 
       <!-- Museu circular, totalmente geométrico -->
       <a-cylinder radius="10" height="0.16" position="0 -0.08 0" material="color:#281A13; roughness:.8; metalness:.05" segments-radial="64"></a-cylinder>
       <a-ring radius-inner="2.1" radius-outer="9.8" rotation="-90 0 0" position="0 .012 0" material="color:#3A271C; roughness:.72; metalness:.06; side:double" segments-theta="96"></a-ring>
       <a-ring radius-inner="5.9" radius-outer="6" rotation="-90 0 0" position="0 .018 0" material="color:#B47439; emissive:#6B371B; emissiveIntensity:.18; side:double" segments-theta="96"></a-ring>
-      <a-cylinder radius="10" height="7" position="0 3.5 0" open-ended="true" material="color:#49352A; side:back; roughness:.92" segments-radial="64"></a-cylinder>
-      <a-cylinder radius="9.75" height="1.25" position="0 6.35 0" open-ended="true" material="color:#1B120E; side:back; roughness:.8" segments-radial="64"></a-cylinder>
-      <a-circle radius="10" rotation="90 0 0" position="0 7 0" material="color:#17100D; roughness:1; side:double" segments="64"></a-circle>
-      <a-ring radius-inner="2.5" radius-outer="3.05" rotation="90 0 0" position="0 6.94 0" material="color:#C1813F; emissive:#8E4E22; emissiveIntensity:.38; side:double" segments-theta="64"></a-ring>
+      <a-cylinder radius="10" height="6" position="0 3 0" open-ended="true" material="color:#49352A; side:back; roughness:.92" segments-radial="64"></a-cylinder>
+      <a-cylinder radius="9.75" height=".95" position="0 5.5 0" open-ended="true" material="color:#1B120E; side:back; roughness:.8" segments-radial="64"></a-cylinder>
+      <a-circle radius="10" rotation="90 0 0" position="0 6 0" material="color:#17100D; roughness:1; side:double" segments="64"></a-circle>
+      <a-ring radius-inner="2.5" radius-outer="3.05" rotation="90 0 0" position="0 5.94 0" material="color:#C1813F; emissive:#8E4E22; emissiveIntensity:.38; side:double" segments-theta="64"></a-ring>
 
       <!-- Frisos de cordel -->
-      <a-torus radius="9.82" radius-tubular="0.035" rotation="90 0 0" position="0 5.75 0" material="color:#D19A55; emissive:#7A441F; emissiveIntensity:.2" segments-radial="12" segments-tubular="96"></a-torus>
+      <a-torus radius="9.82" radius-tubular="0.035" rotation="90 0 0" position="0 5.55 0" material="color:#D19A55; emissive:#7A441F; emissiveIntensity:.2" segments-radial="12" segments-tubular="96"></a-torus>
       <a-torus radius="9.82" radius-tubular="0.025" rotation="90 0 0" position="0 1.05 0" material="color:#9E6333" segments-radial="10" segments-tubular="96"></a-torus>
 
       <!-- Colunas -->
@@ -151,7 +151,7 @@
       </a-entity>
 
       <!-- Navegação entre sessões por fixação do olhar -->
-      <a-entity id="ceiling-controls" position="0 6.82 0" rotation="90 0 0">
+      <a-entity id="ceiling-controls" position="0 5.82 0" rotation="90 0 0">
         <a-ring radius-inner="1.72" radius-outer="1.77" material="color:#9D6333;emissive:#613417;emissiveIntensity:.25"></a-ring>
         <a-circle id="previous-session-target" class="interactive gaze-target" radius=".58" position="-1.5 0 .02" material="color:#78503A;emissive:#3D271D;emissiveIntensity:.3"></a-circle>
         <a-circle id="music-toggle-target" class="interactive gaze-target" radius=".58" position="0 0 .02" material="color:#8B633B;emissive:#4B321D;emissiveIntensity:.3"></a-circle>
