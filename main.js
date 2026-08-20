@@ -101,7 +101,7 @@ function installSBS(scene){
   let enabled=false
   renderer.render=function(scene3D,camera){
     if(!enabled||renderer.xr?.isPresenting)return originalRender(scene3D,camera)
-    renderer.getDrawingBufferSize(size);const half=Math.floor(size.x/2),previousAspect=camera.aspect;renderer.setScissorTest(true)
+    renderer.getSize(size);const half=Math.floor(size.x/2),previousAspect=camera.aspect;renderer.setScissorTest(true)
     if(typeof camera.aspect==='number'){camera.aspect=half/size.y;camera.updateProjectionMatrix()}
     renderer.setScissor(0,0,half,size.y);renderer.setViewport(0,0,half,size.y);originalRender(scene3D,camera)
     renderer.setScissor(half,0,half,size.y);renderer.setViewport(half,0,half,size.y);originalRender(scene3D,camera)
