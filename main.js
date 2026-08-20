@@ -108,10 +108,13 @@ function installSBS(scene){
     renderer.setScissorTest(false);renderer.setViewport(0,0,size.x,size.y)
   }
   function setOverlay(visible){$('.hud').style.display=visible?'flex':'none';$('.orientation').style.display=visible?'flex':'none'}
-  async function activate(){enabled=true;setOverlay(false);try{await document.documentElement.requestFullscreen?.({navigationUI:'hide'})}catch{};try{await screen.orientation?.lock?.('landscape')}catch{}}
+  async function requestMotion(){if(typeof DeviceOrientationEvent!=='undefined'&&typeof DeviceOrientationEvent.requestPermission==='function')try{await DeviceOrientationEvent.requestPermission()}catch{}}
+  async function enterFullscreen(){try{await document.documentElement.requestFullscreen?.({navigationUI:'hide'})}catch{};try{await screen.orientation?.lock?.('landscape')}catch{}}
+  async function activate(){unlockSessionMusic();await requestMotion();await enterFullscreen();enabled=true;setOverlay(false)}
   async function deactivate(){enabled=false;setOverlay(true);try{screen.orientation?.unlock?.()}catch{};if(document.fullscreenElement)try{await document.exitFullscreen()}catch{}}
   $('#enter-vr').addEventListener('click',()=>{unlockSessionMusic();enabled?deactivate():activate()})
-  document.addEventListener('fullscreenchange',()=>{if(!document.fullscreenElement&&enabled){enabled=false;setOverlay(true)}})
+  $('#enter-fullscreen').addEventListener('click',async()=>{unlockSessionMusic();if(document.fullscreenElement)await document.exitFullscreen();else await enterFullscreen()})
+  document.addEventListener('fullscreenchange',()=>{const fullscreen=Boolean(document.fullscreenElement);$('#enter-fullscreen').textContent=fullscreen?'SAIR DA TELA CHEIA':'TELA CHEIA';if(!fullscreen&&enabled){enabled=false;setOverlay(true)}})
   window.addEventListener('keydown',event=>{if(event.key==='Escape'&&enabled)deactivate()})
 }
 AFRAME.registerComponent('canvas-label',{
@@ -130,7 +133,7 @@ AFRAME.registerComponent('canvas-label',{
 function make(tag,attributes={}){const element=document.createElement(tag);Object.entries(attributes).forEach(([key,value])=>element.setAttribute(key,value));return element}
 function canvasLabel(text,{width=3.4,height=.5,position='0 0 .15',color='#2E1D14',fontSize=58,align='left',weight='600'}={}){const plane=make('a-plane',{width:String(width),height:String(height),position,material:'shader:flat;transparent:true;opacity:1;color:#fff'});plane.setAttribute('canvas-label',{text,color,fontSize,align,weight});return plane}
 
-function panelPosition(index,total){const angle=index*(360/total),radians=angle*Math.PI/180,radius=9.18;return{position:`${Math.sin(radians)*radius} 3.15 ${-Math.cos(radians)*radius}`,rotation:`0 ${-angle} 0`}}
+function panelPosition(index,total){const angle=index*(360/total),radians=angle*Math.PI/180,radius=6.8;return{position:`${Math.sin(radians)*radius} 3.15 ${-Math.cos(radians)*radius}`,rotation:`0 ${-angle} 0`}}
 function frame(){
   const panel=make('a-entity')
   panel.append(make('a-box',{width:'3.95',height:'4.65',depth:'.14',material:'shader:flat;color:#18100D'}))
