@@ -123,10 +123,10 @@ function installSBS(scene){
   window.addEventListener('keydown',event=>{if(event.key==='Escape'&&enabled)deactivate()})
 }
 AFRAME.registerComponent('canvas-label',{
-  schema:{text:{default:''},color:{default:'#2E1D14'},fontSize:{type:'int',default:58},align:{default:'left'},weight:{default:'600'}},
+  schema:{text:{default:''},color:{default:'#073F73'},fontSize:{type:'int',default:58},align:{default:'left'},weight:{default:'600'}},
   update(){
     const planeWidth=Number(this.el.getAttribute('width'))||3.4,planeHeight=Number(this.el.getAttribute('height'))||.5
-    const canvas=document.createElement('canvas');canvas.width=1024;canvas.height=Math.max(80,Math.round(1024*planeHeight/planeWidth));const context=canvas.getContext('2d');context.clearRect(0,0,canvas.width,canvas.height);context.fillStyle=this.data.color;context.font=`${this.data.weight} ${this.data.fontSize}px Arial, sans-serif`;context.textBaseline='middle'
+    const canvas=document.createElement('canvas');canvas.width=1024;canvas.height=Math.max(80,Math.round(1024*planeHeight/planeWidth));const context=canvas.getContext('2d');context.clearRect(0,0,canvas.width,canvas.height);context.fillStyle=this.data.color;context.font=`${this.data.weight} ${this.data.fontSize}px Montserrat, Arial, sans-serif`;context.textBaseline='middle'
     const maxWidth=920,lines=[];this.data.text.split('\n').forEach(paragraph=>{const words=paragraph.split(' ');let line='';words.forEach(word=>{const test=line?`${line} ${word}`:word;if(context.measureText(test).width>maxWidth&&line){lines.push(line);line=word}else line=test});lines.push(line)})
     const lineHeight=this.data.fontSize*1.28,total=lineHeight*lines.length,start=canvas.height/2-total/2+lineHeight/2;context.textAlign=this.data.align;const x=this.data.align==='center'?512:this.data.align==='right'?972:52;lines.forEach((line,index)=>context.fillText(line,x,start+index*lineHeight))
     if(this.texture)this.texture.dispose();this.texture=new THREE.CanvasTexture(canvas);this.texture.colorSpace=THREE.SRGBColorSpace;this.texture.needsUpdate=true
@@ -136,19 +136,19 @@ AFRAME.registerComponent('canvas-label',{
 })
 
 function make(tag,attributes={}){const element=document.createElement(tag);Object.entries(attributes).forEach(([key,value])=>element.setAttribute(key,value));return element}
-function canvasLabel(text,{width=3.4,height=.5,position='0 0 .15',color='#2E1D14',fontSize=58,align='left',weight='600'}={}){const plane=make('a-plane',{width:String(width),height:String(height),position,material:'shader:flat;transparent:true;opacity:1;color:#fff'});plane.setAttribute('canvas-label',{text,color,fontSize,align,weight});return plane}
+function canvasLabel(text,{width=3.4,height=.5,position='0 0 .15',color='#073F73',fontSize=58,align='left',weight='600'}={}){const plane=make('a-plane',{width:String(width),height:String(height),position,material:'shader:flat;transparent:true;opacity:1;color:#fff'});plane.setAttribute('canvas-label',{text,color,fontSize,align,weight});return plane}
 
 function panelPosition(index,total){const angle=index*(360/total),radians=angle*Math.PI/180,radius=6.8;return{position:`${Math.sin(radians)*radius} 3.15 ${-Math.cos(radians)*radius}`,rotation:`0 ${-angle} 0`}}
 function frame(){
   const panel=make('a-entity')
-  panel.append(make('a-box',{width:'3.95',height:'4.65',depth:'.14',material:'shader:flat;color:#18100D'}))
-  panel.append(make('a-box',{width:'3.7',height:'4.4',depth:'.04',position:'0 0 .1',material:'shader:flat;color:#F0DDB6'}))
-  panel.append(make('a-box',{width:'1.25',height:'.1',depth:'.18',position:'0 2.42 .38',material:'shader:flat;color:#E6A85F'}))
+  panel.append(make('a-box',{width:'3.95',height:'4.65',depth:'.14',material:'shader:flat;color:#052F57'}))
+  panel.append(make('a-box',{width:'3.7',height:'4.4',depth:'.04',position:'0 0 .1',material:'shader:flat;color:#F7FBFF'}))
+  panel.append(make('a-box',{width:'1.25',height:'.1',depth:'.18',position:'0 2.42 .38',material:'shader:flat;color:#FDBA18'}))
   return panel
 }
 function addVisitButton(panel,panorama){
-  const target=make('a-plane',{class:'interactive gaze-target',width:'2.15',height:'.36',position:'0 -2.02 .22',material:'shader:flat;color:#7B3F20'})
-  const label=canvasLabel('VISITE ESTA ÁREA',{width:1.95,height:.25,position:'0 -2.02 .24',color:'#FFF1D2',fontSize:42,align:'center',weight:'700'})
+  const target=make('a-plane',{class:'interactive gaze-target',width:'2.15',height:'.36',position:'0 -2.02 .22',material:'shader:flat;color:#0867C7'})
+  const label=canvasLabel('VISITE ESTA ÁREA',{width:1.95,height:.25,position:'0 -2.02 .24',color:'#FFFFFF',fontSize:42,align:'center',weight:'700'})
   panel.append(target);panel.append(label);bindGaze(target,()=>enterPanorama(panorama))
 }
 function enterPanorama(panorama){
@@ -181,19 +181,19 @@ function fitPhoto(src,x,maxWidth,maxHeight){const resolvedSrc=assetPath(src),pho
 
 function createPhotoPanel(item,index,total,sessionTitle){
   const panel=frame(),pose=panelPosition(index,total);panel.__homePose=pose;panel.setAttribute('position',pose.position);panel.setAttribute('rotation',pose.rotation)
-  panel.append(canvasLabel(`SESSÃO ${currentSession+1}  /  PAINEL ${String(index+1).padStart(2,'0')}`,{width:3.25,height:.34,position:'0 1.78 .15',color:'#6B2F10',fontSize:52}))
-  panel.append(canvasLabel(item.title,{width:3.25,height:.72,position:'0 1.31 .15',color:'#2E1D14',fontSize:68}))
+  panel.append(canvasLabel(`SESSÃO ${currentSession+1}  /  PAINEL ${String(index+1).padStart(2,'0')}`,{width:3.25,height:.34,position:'0 1.78 .15',color:'#0867C7',fontSize:52}))
+  panel.append(canvasLabel(item.title,{width:3.25,height:.72,position:'0 1.31 .15',color:'#073F73',fontSize:68}))
   const group=make('a-entity',{position:'0 .25 .16'}),count=item.photos.length,layouts=count===3?[[-1.18,1.05,1.5],[0,1.05,1.5],[1.18,1.05,1.5]]:count===2?[[-.86,1.55,1.5],[.86,1.55,1.5]]:[[0,3.05,1.5]]
   item.photos.forEach((src,i)=>{const[x,width,height]=layouts[i];group.append(fitPhoto(src,x,width,height))});panel.append(group)
-  panel.append(canvasLabel(item.caption,{width:3.25,height:.9,position:'0 -1.12 .15',color:'#21150F',fontSize:52,weight:'600'}))
-  panel.append(canvasLabel(`${count} ${count===1?'FOTOGRAFIA':'FOTOGRAFIAS AGRUPADAS'}`,{width:3.25,height:.25,position:'0 -1.72 .15',color:'#6B2F10',fontSize:42}));if(item.panorama)addVisitButton(panel,item.panorama);return panel
+  panel.append(canvasLabel(item.caption,{width:3.25,height:.9,position:'0 -1.12 .15',color:'#163B5C',fontSize:52,weight:'600'}))
+  panel.append(canvasLabel(`${count} ${count===1?'FOTOGRAFIA':'FOTOGRAFIAS AGRUPADAS'}`,{width:3.25,height:.25,position:'0 -1.72 .15',color:'#0867C7',fontSize:42}));if(item.panorama)addVisitButton(panel,item.panorama);return panel
 }
 
 function createPoemPanel(poem,index,total,sessionTitle){
   const panel=frame(),pose=panelPosition(index,total);panel.__homePose=pose;panel.setAttribute('position',pose.position);panel.setAttribute('rotation',pose.rotation)
   const poemLineCount=poem.lines.split('\n').length,poemFontSize=poemLineCount>=9?38:poemLineCount>=7?43:54
-  panel.append(canvasLabel(`SESSÃO ${currentSession+1}  /  POESIA`,{width:3.25,height:.34,position:'0 1.76 .15',color:'#6B2F10',fontSize:52}));panel.append(canvasLabel('FOLHETO DIGITAL',{width:3.25,height:.45,position:'0 1.3 .15',fontSize:65}))
-  panel.append(make('a-box',{width:'3.05',height:'2.35',depth:'.035',position:'0 -.05 .15',material:'shader:flat;color:#271710'}));panel.append(canvasLabel(poem.lines,{width:2.8,height:1.28,position:'0 .34 .2',color:'#FFF1D2',fontSize:poemFontSize,align:'center',weight:'600'}));panel.append(canvasLabel(poem.author,{width:2.7,height:.35,position:'0 -.88 .2',color:'#F2B769',fontSize:42,align:'center'}));panel.append(canvasLabel(`Poema: ${poem.work}\nPoesia de Uauá`,{width:3.1,height:.55,position:'0 -1.52 .15',color:'#21150F',fontSize:40,align:'center',weight:'600'}));return panel
+  panel.append(canvasLabel(`SESSÃO ${currentSession+1}  /  POESIA`,{width:3.25,height:.34,position:'0 1.76 .15',color:'#0867C7',fontSize:52}));panel.append(canvasLabel('FOLHETO DIGITAL',{width:3.25,height:.45,position:'0 1.3 .15',color:'#073F73',fontSize:65}))
+  panel.append(make('a-box',{width:'3.05',height:'2.35',depth:'.035',position:'0 -.05 .15',material:'shader:flat;color:#073F73'}));panel.append(canvasLabel(poem.lines,{width:2.8,height:1.28,position:'0 .34 .2',color:'#FFFFFF',fontSize:poemFontSize,align:'center',weight:'600'}));panel.append(canvasLabel(poem.author,{width:2.7,height:.35,position:'0 -.88 .2',color:'#FDBA18',fontSize:42,align:'center'}));panel.append(canvasLabel(`Poema: ${poem.work}\nPoesia de Uauá`,{width:3.1,height:.55,position:'0 -1.52 .15',color:'#163B5C',fontSize:40,align:'center',weight:'600'}));return panel
 }
 
 function renderSession(){
@@ -209,12 +209,12 @@ function nextSession(){currentSession=(currentSession+1)%sessions.length;renderS
 function previousSession(){currentSession=(currentSession-1+sessions.length)%sessions.length;renderSession()}
 function bindGaze(target,action){let timer=null,cooldown=false;target.addEventListener('mouseenter',()=>{if(cooldown)return;target.setAttribute('animation__gaze','property:scale;from:1 1 1;to:1.18 1.18 1.18;dur:1600;easing:linear');timer=setTimeout(()=>{cooldown=true;action();target.setAttribute('animation__gaze','property:scale;to:1 1 1;dur:220');setTimeout(()=>cooldown=false,1200)},1600)});target.addEventListener('mouseleave',()=>{clearTimeout(timer);target.removeAttribute('animation__gaze');target.setAttribute('scale','1 1 1')})}
 
-function createColumns(){const columns=$('#columns');for(let i=0;i<12;i++){const angle=i*30,r=angle*Math.PI/180,e=make('a-entity',{position:`${Math.sin(r)*9.45} 0 ${Math.cos(r)*9.45}`});e.innerHTML='<a-cylinder radius=".18" height="5.65" position="0 2.85 0" material="color:#6A4B39;roughness:.88" segments-radial="12"></a-cylinder><a-cylinder radius=".34" height=".14" position="0 .07 0" material="color:#A36E42"></a-cylinder>';columns.append(e)}}
+function createColumns(){const columns=$('#columns');for(let i=0;i<12;i++){const angle=i*30,r=angle*Math.PI/180,e=make('a-entity',{position:`${Math.sin(r)*9.45} 0 ${Math.cos(r)*9.45}`});e.innerHTML='<a-cylinder radius=".18" height="5.65" position="0 2.85 0" material="color:#0B67C8;roughness:.88" segments-radial="12"></a-cylinder><a-cylinder radius=".34" height=".14" position="0 .07 0" material="color:#FDBA18"></a-cylinder>';columns.append(e)}}
 
-function createCeilingLabels(){const controls=$('#ceiling-controls');controls.append(canvasLabel('SESSÃO\nANTERIOR',{width:1.25,height:.62,position:'-1.5 .08 .04',color:'#FFF0D2',fontSize:50,align:'center'}));const musicLabel=canvasLabel('PAUSAR\nMÚSICA',{width:1.25,height:.62,position:'0 .08 .04',color:'#FFF0D2',fontSize:50,align:'center'});musicLabel.id='music-control-label';controls.append(musicLabel);controls.append(canvasLabel('PRÓXIMA\nSESSÃO',{width:1.25,height:.62,position:'1.5 .08 .04',color:'#FFF0D2',fontSize:50,align:'center'}));controls.append(canvasLabel('FIXE O OLHAR PARA NAVEGAR',{width:3.1,height:.32,position:'0 -1.18 .03',color:'#CFA467',fontSize:45,align:'center'}))}
+function createCeilingLabels(){const controls=$('#ceiling-controls');controls.append(canvasLabel('SESSÃO\nANTERIOR',{width:1.25,height:.62,position:'-1.5 .08 .04',color:'#FFFFFF',fontSize:50,align:'center'}));const musicLabel=canvasLabel('PAUSAR\nMÚSICA',{width:1.25,height:.62,position:'0 .08 .04',color:'#FFFFFF',fontSize:50,align:'center'});musicLabel.id='music-control-label';controls.append(musicLabel);controls.append(canvasLabel('PRÓXIMA\nSESSÃO',{width:1.25,height:.62,position:'1.5 .08 .04',color:'#FFFFFF',fontSize:50,align:'center'}));controls.append(canvasLabel('FIXE O OLHAR PARA NAVEGAR',{width:3.1,height:.32,position:'0 -1.18 .03',color:'#FDBA18',fontSize:45,align:'center'}))}
 function createExperienceExit(){
-  const control=make('a-entity',{id:'experience-exit',position:'4.6 2.65 -4.6',rotation:'0 -45 0',visible:'false'}),target=make('a-plane',{class:'interactive gaze-target',width:'2.35',height:'.62',material:'shader:flat;color:#3B1B10;opacity:.98'})
-  control.append(target);control.append(canvasLabel('SAIR DA EXPERIÊNCIA',{width:2.12,height:.38,position:'0 0 .03',color:'#FFF7E8',fontSize:48,align:'center',weight:'700'}));$('a-scene').append(control);bindGaze(target,exitExperience)
+  const control=make('a-entity',{id:'experience-exit',position:'4.6 2.65 -4.6',rotation:'0 -45 0',visible:'false'}),target=make('a-plane',{class:'interactive gaze-target',width:'2.35',height:'.62',material:'shader:flat;color:#073F73;opacity:.98'})
+  control.append(target);control.append(canvasLabel('SAIR DA EXPERIÊNCIA',{width:2.12,height:.38,position:'0 0 .03',color:'#FFFFFF',fontSize:48,align:'center',weight:'700'}));$('a-scene').append(control);bindGaze(target,exitExperience)
 }
 
 window.addEventListener('DOMContentLoaded',()=>{createColumns();createCeilingLabels();createExperienceExit();renderSession();document.addEventListener('pointerdown',unlockSessionMusic,{once:true});bindGaze($('#previous-session-target'),previousSession);bindGaze($('#music-toggle-target'),toggleSessionMusic);bindGaze($('#next-session-target'),nextSession);const scene=$('a-scene');scene.addEventListener('loaded',()=>{scene.renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.5));installSBS(scene);setTimeout(()=>$('#loading').classList.add('hide'),450)})})

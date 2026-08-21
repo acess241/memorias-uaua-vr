@@ -5,7 +5,7 @@
   "scope": "./",
   "display": "fullscreen",
   "orientation": "landscape",
-  "background_color": "#090706",
-  "theme_color": "#120d0a",
+  "background_color": "#052f57",
+  "theme_color": "#073f73",
   "description": "Museu imersivo sobre o patrimônio e a memória de Uauá."
 }
