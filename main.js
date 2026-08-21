@@ -67,6 +67,7 @@ const sessions = [
 ]
 
 let currentSession=0
+let leaveSBS=async()=>{}
 const $=selector=>document.querySelector(selector)
 const assetPath=path=>`${import.meta.env.BASE_URL}${path.replace(/^\/+/, '')}`
 const sessionAudio=new Audio()
@@ -113,14 +114,9 @@ function installSBS(scene){
   async function requestMotion(){if(typeof DeviceOrientationEvent!=='undefined'&&typeof DeviceOrientationEvent.requestPermission==='function')try{await DeviceOrientationEvent.requestPermission()}catch{}}
   async function enterFullscreen(){document.body.classList.add('pseudo-fullscreen');const request=document.documentElement.requestFullscreen||document.documentElement.webkitRequestFullscreen;try{if(request)await request.call(document.documentElement,{navigationUI:'hide'})}catch{};try{await screen.orientation?.lock?.('landscape')}catch{};const active=Boolean(fullscreenElement());$('#enter-fullscreen').textContent=active?'SAIR DA TELA CHEIA':'MODO AMPLO';return active}
   async function leaveFullscreen(){document.body.classList.remove('pseudo-fullscreen');const exit=document.exitFullscreen||document.webkitExitFullscreen;try{if(fullscreenElement()&&exit)await exit.call(document)}catch{};try{screen.orientation?.unlock?.()}catch{};$('#enter-fullscreen').textContent='TELA CHEIA'}
-  function showExitControl(){
-    if($('#exit-sbs-control'))return
-    const control=make('a-entity',{id:'exit-sbs-control',position:'0 4.65 -5.8'}),target=make('a-plane',{class:'interactive gaze-target',width:'1.15',height:'.34',material:'shader:flat;color:#301C14;opacity:.9'})
-    control.append(target);control.append(canvasLabel('SAIR DO VR',{width:1.02,height:.22,position:'0 0 .03',color:'#FFF1D2',fontSize:39,align:'center',weight:'700'}));scene.append(control)
-    bindGaze(target,deactivate)
-  }
-  async function activate(){unlockSessionMusic();enabled=true;setOverlay(false);document.body.classList.add('sbs-active');showExitControl();await Promise.allSettled([requestMotion(),enterFullscreen()])}
-  async function deactivate(){if(!enabled)return;enabled=false;$('#exit-sbs-control')?.remove();document.body.classList.remove('sbs-active');setOverlay(true);await leaveFullscreen()}
+  async function activate(){unlockSessionMusic();enabled=true;setOverlay(false);document.body.classList.add('sbs-active');$('#experience-exit').setAttribute('visible','true');await Promise.allSettled([requestMotion(),enterFullscreen()])}
+  async function deactivate(){if(!enabled)return;enabled=false;document.body.classList.remove('sbs-active');setOverlay(true);if(!$('#visit-panorama'))$('#experience-exit').setAttribute('visible','false');await leaveFullscreen()}
+  leaveSBS=deactivate
   $('#enter-vr').addEventListener('click',()=>{unlockSessionMusic();enabled?deactivate():activate()})
   $('#enter-fullscreen').addEventListener('click',async()=>{unlockSessionMusic();if(fullscreenElement()||document.body.classList.contains('pseudo-fullscreen'))await leaveFullscreen();else await enterFullscreen()})
   ;['fullscreenchange','webkitfullscreenchange'].forEach(name=>document.addEventListener(name,()=>{$('#enter-fullscreen').textContent=fullscreenElement()||document.body.classList.contains('pseudo-fullscreen')?'SAIR DA TELA CHEIA':'TELA CHEIA'}))
@@ -159,25 +155,27 @@ function enterPanorama(panorama){
   if($('#visit-panorama'))return
   const scene=$('a-scene'),rig=$('#rig'),sky=make('a-sky',{id:'visit-panorama',src:assetPath(panorama),radius:'45',rotation:'0 -90 0',material:'shader:flat;side:back'})
   Array.from(scene.children).forEach(element=>{
-    if(element===rig||element.id==='exit-sbs-control'||element.tagName==='A-ASSETS')return
+    if(element===rig||element.id==='experience-exit'||element.tagName==='A-ASSETS')return
     element.dataset.visitVisibility=String(element.getAttribute('visible')!==false)
     element.setAttribute('visible','false')
   })
   scene.append(sky)
-  const back=make('a-entity',{id:'visit-back',position:'0 3.65 -5.8'})
-  const target=make('a-plane',{class:'interactive gaze-target',width:'1.35',height:'.38',material:'shader:flat;color:#6B351D;opacity:.92'})
-  back.append(target);back.append(canvasLabel('VOLTAR À SALA',{width:1.2,height:.24,position:'0 0 .03',color:'#FFF1D2',fontSize:38,align:'center',weight:'700'}));scene.append(back)
-  bindGaze(target,exitPanorama)
+  $('#experience-exit').setAttribute('visible','true')
   document.body.classList.add('panorama-active')
 }
 function exitPanorama(){
-  $('#visit-panorama')?.remove();$('#visit-back')?.remove()
+  $('#visit-panorama')?.remove()
   const scene=$('a-scene'),rig=$('#rig')
   Array.from(scene.children).forEach(element=>{
     if(element===rig||element.tagName==='A-ASSETS'||element.id==='visit-panorama')return
     if(element.dataset.visitVisibility!==undefined){element.setAttribute('visible',element.dataset.visitVisibility==='true');delete element.dataset.visitVisibility}
   })
   document.body.classList.remove('panorama-active')
+}
+async function exitExperience(){
+  if($('#visit-panorama'))exitPanorama()
+  await leaveSBS()
+  $('#experience-exit').setAttribute('visible','false')
 }
 function fitPhoto(src,x,maxWidth,maxHeight){const resolvedSrc=assetPath(src),photo=make('a-image',{src:resolvedSrc,width:String(maxWidth),height:String(maxHeight),position:`${x} 0 0`,material:'shader:flat'}),image=new Image();image.onload=()=>{const ratio=image.naturalWidth/image.naturalHeight,box=maxWidth/maxHeight;if(ratio>box){photo.setAttribute('width',maxWidth);photo.setAttribute('height',maxWidth/ratio)}else{photo.setAttribute('height',maxHeight);photo.setAttribute('width',maxHeight*ratio)}};image.src=resolvedSrc;return photo}
 
@@ -214,5 +212,9 @@ function bindGaze(target,action){let timer=null,cooldown=false;target.addEventLi
 function createColumns(){const columns=$('#columns');for(let i=0;i<12;i++){const angle=i*30,r=angle*Math.PI/180,e=make('a-entity',{position:`${Math.sin(r)*9.45} 0 ${Math.cos(r)*9.45}`});e.innerHTML='<a-cylinder radius=".18" height="5.65" position="0 2.85 0" material="color:#6A4B39;roughness:.88" segments-radial="12"></a-cylinder><a-cylinder radius=".34" height=".14" position="0 .07 0" material="color:#A36E42"></a-cylinder>';columns.append(e)}}
 
 function createCeilingLabels(){const controls=$('#ceiling-controls');controls.append(canvasLabel('SESSÃO\nANTERIOR',{width:1.25,height:.62,position:'-1.5 .08 .04',color:'#FFF0D2',fontSize:50,align:'center'}));const musicLabel=canvasLabel('PAUSAR\nMÚSICA',{width:1.25,height:.62,position:'0 .08 .04',color:'#FFF0D2',fontSize:50,align:'center'});musicLabel.id='music-control-label';controls.append(musicLabel);controls.append(canvasLabel('PRÓXIMA\nSESSÃO',{width:1.25,height:.62,position:'1.5 .08 .04',color:'#FFF0D2',fontSize:50,align:'center'}));controls.append(canvasLabel('FIXE O OLHAR PARA NAVEGAR',{width:3.1,height:.32,position:'0 -1.18 .03',color:'#CFA467',fontSize:45,align:'center'}))}
+function createExperienceExit(){
+  const control=make('a-entity',{id:'experience-exit',position:'4.6 2.65 -4.6',rotation:'0 -45 0',visible:'false'}),target=make('a-plane',{class:'interactive gaze-target',width:'1.45',height:'.4',material:'shader:flat;color:#542B1B;opacity:.94'})
+  control.append(target);control.append(canvasLabel('SAIR DA EXPERIÊNCIA',{width:1.3,height:.25,position:'0 0 .03',color:'#FFF1D2',fontSize:35,align:'center',weight:'700'}));$('a-scene').append(control);bindGaze(target,exitExperience)
+}
 
-window.addEventListener('DOMContentLoaded',()=>{createColumns();createCeilingLabels();renderSession();document.addEventListener('pointerdown',unlockSessionMusic,{once:true});bindGaze($('#previous-session-target'),previousSession);bindGaze($('#music-toggle-target'),toggleSessionMusic);bindGaze($('#next-session-target'),nextSession);const scene=$('a-scene');scene.addEventListener('loaded',()=>{scene.renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.5));installSBS(scene);setTimeout(()=>$('#loading').classList.add('hide'),450)})})
+window.addEventListener('DOMContentLoaded',()=>{createColumns();createCeilingLabels();createExperienceExit();renderSession();document.addEventListener('pointerdown',unlockSessionMusic,{once:true});bindGaze($('#previous-session-target'),previousSession);bindGaze($('#music-toggle-target'),toggleSessionMusic);bindGaze($('#next-session-target'),nextSession);const scene=$('a-scene');scene.addEventListener('loaded',()=>{scene.renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.5));installSBS(scene);setTimeout(()=>$('#loading').classList.add('hide'),450)})})
