@@ -105,7 +105,7 @@ function installSBS(scene){
   renderer.render=function(scene3D,camera){
     if(!enabled||renderer.xr?.isPresenting)return originalRender(scene3D,camera)
     renderer.getSize(size);const leftWidth=Math.floor(size.x/2),rightWidth=size.x-leftWidth
-    camera.focus=7.65;camera.updateMatrixWorld();stereo.update(camera);renderer.setScissorTest(true)
+    camera.focus=8.25;camera.updateMatrixWorld();stereo.update(camera);renderer.setScissorTest(true)
     renderer.setScissor(0,0,leftWidth,size.y);renderer.setViewport(0,0,leftWidth,size.y);originalRender(scene3D,stereo.cameraL)
     renderer.setScissor(leftWidth,0,rightWidth,size.y);renderer.setViewport(leftWidth,0,rightWidth,size.y);originalRender(scene3D,stereo.cameraR)
     renderer.setScissorTest(false);renderer.setViewport(0,0,size.x,size.y)
@@ -139,7 +139,7 @@ AFRAME.registerComponent('canvas-label',{
 function make(tag,attributes={}){const element=document.createElement(tag);Object.entries(attributes).forEach(([key,value])=>element.setAttribute(key,value));return element}
 function canvasLabel(text,{width=3.4,height=.5,position='0 0 .15',color='#073F73',fontSize=58,align='left',weight='600'}={}){const plane=make('a-plane',{width:String(width),height:String(height),position,material:'shader:flat;transparent:true;opacity:1;color:#fff'});plane.setAttribute('canvas-label',{text,color,fontSize,align,weight});return plane}
 
-function panelPosition(index,total){const angle=index*(360/total),radians=angle*Math.PI/180,radius=7.65;return{position:`${Math.sin(radians)*radius} 3.18 ${-Math.cos(radians)*radius}`,rotation:`0 ${-angle} 0`}}
+function panelPosition(index,total){const angle=index*(360/total),radians=angle*Math.PI/180,radius=8.25;return{position:`${Math.sin(radians)*radius} 3.18 ${-Math.cos(radians)*radius}`,rotation:`0 ${-angle} 0`}}
 function frame(){
   const panel=make('a-entity')
   panel.append(make('a-box',{width:'4.35',height:'5.25',depth:'.14',material:'shader:flat;color:#052F57'}))
@@ -161,6 +161,7 @@ function enterPanorama(panorama){
     element.setAttribute('visible','false')
   })
   scene.append(sky)
+  $('#camera').setAttribute('fov','82')
   $('#experience-exit').setAttribute('visible','true')
   document.body.classList.add('panorama-active')
 }
@@ -171,6 +172,7 @@ function exitPanorama(){
     if(element===rig||element.tagName==='A-ASSETS'||element.id==='visit-panorama')return
     if(element.dataset.visitVisibility!==undefined){element.setAttribute('visible',element.dataset.visitVisibility==='true');delete element.dataset.visitVisibility}
   })
+  $('#camera').setAttribute('fov','72')
   document.body.classList.remove('panorama-active')
 }
 async function exitExperience(){
@@ -214,7 +216,7 @@ function createColumns(){const columns=$('#columns');for(let i=0;i<12;i++){const
 
 function createCeilingLabels(){const controls=$('#ceiling-controls');controls.append(canvasLabel('SESSÃO\nANTERIOR',{width:1.25,height:.62,position:'-1.5 .08 .04',color:'#FFFFFF',fontSize:50,align:'center'}));const musicLabel=canvasLabel('PAUSAR\nMÚSICA',{width:1.25,height:.62,position:'0 .08 .04',color:'#FFFFFF',fontSize:50,align:'center'});musicLabel.id='music-control-label';controls.append(musicLabel);controls.append(canvasLabel('PRÓXIMA\nSESSÃO',{width:1.25,height:.62,position:'1.5 .08 .04',color:'#FFFFFF',fontSize:50,align:'center'}));controls.append(canvasLabel('FIXE O OLHAR PARA NAVEGAR',{width:3.1,height:.32,position:'0 -1.18 .03',color:'#FDBA18',fontSize:45,align:'center'}))}
 function createExperienceExit(){
-  const control=make('a-entity',{id:'experience-exit',position:'4.6 2.65 -4.6',rotation:'0 -45 0',visible:'false'}),target=make('a-plane',{class:'interactive gaze-target',width:'2.35',height:'.62',material:'shader:flat;color:#073F73;opacity:.98'})
+  const control=make('a-entity',{id:'experience-exit',position:'5.7 2.65 -5.7',rotation:'0 -45 0',visible:'false'}),target=make('a-plane',{class:'interactive gaze-target',width:'2.35',height:'.62',material:'shader:flat;color:#073F73;opacity:.98'})
   control.append(target);control.append(canvasLabel('SAIR DA EXPERIÊNCIA',{width:2.12,height:.38,position:'0 0 .03',color:'#FFFFFF',fontSize:48,align:'center',weight:'700'}));$('a-scene').append(control);bindGaze(target,exitExperience)
 }
 
