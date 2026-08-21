@@ -151,12 +151,14 @@
         </a-entity>
       </a-entity>
 
-      <!-- Navegação entre sessões por fixação do olhar -->
-      <a-entity id="ceiling-controls" position="0 5.82 0" rotation="90 0 0">
-        <a-ring radius-inner="1.72" radius-outer="1.77" material="color:#FDBA18;emissive:#9E6900;emissiveIntensity:.3"></a-ring>
-        <a-circle id="previous-session-target" class="interactive gaze-target" radius=".58" position="-1.5 0 .02" material="color:#073F73;emissive:#052F57;emissiveIntensity:.35"></a-circle>
-        <a-circle id="music-toggle-target" class="interactive gaze-target" radius=".58" position="0 0 .02" material="color:#0B67C8;emissive:#073F73;emissiveIntensity:.35"></a-circle>
-        <a-circle id="next-session-target" class="interactive gaze-target" radius=".58" position="1.5 0 .02" material="color:#1687E5;emissive:#073F73;emissiveIntensity:.35"></a-circle>
+      <!-- Painel fixo de navegação, atrás do ponto inicial -->
+      <a-entity id="ceiling-controls" position="0 2.65 5.35" rotation="0 180 0">
+        <a-box width="5.05" height="2.75" depth=".13" position="0 -.18 0" material="shader:flat;color:#052F57"></a-box>
+        <a-box width="4.8" height="2.5" depth=".04" position="0 -.18 .08" material="shader:flat;color:#F7FBFF"></a-box>
+        <a-box width="1.7" height=".1" depth=".15" position="0 1.18 .14" material="shader:flat;color:#FDBA18"></a-box>
+        <a-circle id="previous-session-target" class="interactive gaze-target" radius=".68" position="-1.55 .12 .13" material="color:#073F73;emissive:#052F57;emissiveIntensity:.35"></a-circle>
+        <a-circle id="music-toggle-target" class="interactive gaze-target" radius=".68" position="0 .12 .13" material="color:#0B67C8;emissive:#073F73;emissiveIntensity:.35"></a-circle>
+        <a-circle id="next-session-target" class="interactive gaze-target" radius=".68" position="1.55 .12 .13" material="color:#1687E5;emissive:#073F73;emissiveIntensity:.35"></a-circle>
         <a-text id="next-session-label" visible="false"></a-text>
       </a-entity>
 
@@ -175,7 +177,7 @@
       </div>
     </header>
 
-    <aside class="orientation"><i></i><span>OLHE AO REDOR · O ÚNICO CONTROLE ESTÁ NO TETO</span></aside>
+    <aside class="orientation"><i></i><span>OLHE AO REDOR · O PAINEL DE NAVEGAÇÃO ESTÁ ATRÁS DE VOCÊ</span></aside>
     <aside class="reconstruction-note">RECONSTRUÇÃO VISUAL DIGITAL · Imagens interpretativas reconstruídas e colorizadas digitalmente. As cenas não são reproduções 100% exatas dos locais históricos.</aside>
 
     <script type="module" src="/main.js"></script>
