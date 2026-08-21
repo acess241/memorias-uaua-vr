@@ -139,7 +139,7 @@ AFRAME.registerComponent('canvas-label',{
 function make(tag,attributes={}){const element=document.createElement(tag);Object.entries(attributes).forEach(([key,value])=>element.setAttribute(key,value));return element}
 function canvasLabel(text,{width=3.4,height=.5,position='0 0 .15',color='#073F73',fontSize=58,align='left',weight='600'}={}){const plane=make('a-plane',{width:String(width),height:String(height),position,material:'shader:flat;transparent:true;opacity:1;color:#fff'});plane.setAttribute('canvas-label',{text,color,fontSize,align,weight});return plane}
 
-function panelPosition(index,total){const angle=index*(360/total),radians=angle*Math.PI/180,radius=8.25;return{position:`${Math.sin(radians)*radius} 3.18 ${-Math.cos(radians)*radius}`,rotation:`0 ${-angle} 0`}}
+function panelPosition(index,total){const angle=total<=1?0:-135+index*(270/(total-1)),radians=angle*Math.PI/180,radius=8.25;return{position:`${Math.sin(radians)*radius} 3.18 ${-Math.cos(radians)*radius}`,rotation:`0 ${-angle} 0`}}
 function frame(){
   const panel=make('a-entity')
   panel.append(make('a-box',{width:'4.35',height:'5.25',depth:'.14',material:'shader:flat;color:#052F57'}))
