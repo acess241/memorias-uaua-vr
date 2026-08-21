@@ -116,7 +116,7 @@ function installSBS(scene){
   function showExitControl(){
     if($('#exit-sbs-control'))return
     const control=make('a-entity',{id:'exit-sbs-control',position:'0 .62 -2.15'}),target=make('a-plane',{class:'interactive gaze-target',width:'1.75',height:'.5',material:'shader:flat;color:#301C14;opacity:.96;depthTest:false'})
-    control.append(target);control.append(canvasLabel('SAIR DO VR',{width:1.55,height:.3,position:'0 0 .03',color:'#FFF1D2',fontSize:45,align:'center',weight:'700'}));$('#camera').append(control)
+    control.append(target);control.append(canvasLabel('SAIR DO VR',{width:1.55,height:.3,position:'0 0 .03',color:'#FFF1D2',fontSize:45,align:'center',weight:'700'}));$('#rig').append(control)
     bindGaze(target,deactivate);target.addEventListener('click',deactivate)
   }
   async function activate(){unlockSessionMusic();enabled=true;setOverlay(false);document.body.classList.add('sbs-active');showExitControl();await Promise.allSettled([requestMotion(),enterFullscreen()])}
