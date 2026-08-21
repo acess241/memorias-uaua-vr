@@ -144,23 +144,40 @@ function frame(){
   panel.append(make('a-box',{width:'1.25',height:'.1',depth:'.18',position:'0 2.42 .38',material:'shader:flat;color:#E6A85F'}))
   return panel
 }
+function addVisitButton(panel){
+  const target=make('a-plane',{class:'interactive gaze-target',width:'2.15',height:'.36',position:'0 -2.02 .22',material:'shader:flat;color:#7B3F20'})
+  const label=canvasLabel('VISITE ESTA ÁREA',{width:1.95,height:.25,position:'0 -2.02 .24',color:'#FFF1D2',fontSize:42,align:'center',weight:'700'})
+  panel.append(target);panel.append(label);bindGaze(target,()=>togglePanelVisit(panel,label))
+}
+function togglePanelVisit(panel,label){
+  const room=$('#monuments-room'),visiting=panel.dataset.visiting==='true'
+  if(visiting){
+    Array.from(room.children).forEach(item=>item.setAttribute('visible','true'))
+    panel.setAttribute('position',panel.__homePose.position);panel.setAttribute('rotation',panel.__homePose.rotation);panel.dataset.visiting='false'
+    label.setAttribute('canvas-label','text','VISITE ESTA ÁREA');$('#ceiling-controls').setAttribute('visible','true')
+  }else{
+    Array.from(room.children).forEach(item=>item.setAttribute('visible',item===panel?'true':'false'))
+    panel.setAttribute('position','0 2.75 -4.2');panel.setAttribute('rotation','0 0 0');panel.dataset.visiting='true'
+    label.setAttribute('canvas-label','text','VOLTAR À SALA');$('#ceiling-controls').setAttribute('visible','false')
+  }
+}
 function fitPhoto(src,x,maxWidth,maxHeight){const resolvedSrc=assetPath(src),photo=make('a-image',{src:resolvedSrc,width:String(maxWidth),height:String(maxHeight),position:`${x} 0 0`,material:'shader:flat'}),image=new Image();image.onload=()=>{const ratio=image.naturalWidth/image.naturalHeight,box=maxWidth/maxHeight;if(ratio>box){photo.setAttribute('width',maxWidth);photo.setAttribute('height',maxWidth/ratio)}else{photo.setAttribute('height',maxHeight);photo.setAttribute('width',maxHeight*ratio)}};image.src=resolvedSrc;return photo}
 
 function createPhotoPanel(item,index,total,sessionTitle){
-  const panel=frame(),pose=panelPosition(index,total);panel.setAttribute('position',pose.position);panel.setAttribute('rotation',pose.rotation)
+  const panel=frame(),pose=panelPosition(index,total);panel.__homePose=pose;panel.setAttribute('position',pose.position);panel.setAttribute('rotation',pose.rotation)
   panel.append(canvasLabel(`SESSÃO ${currentSession+1}  /  PAINEL ${String(index+1).padStart(2,'0')}`,{width:3.25,height:.34,position:'0 1.78 .15',color:'#6B2F10',fontSize:52}))
   panel.append(canvasLabel(item.title,{width:3.25,height:.72,position:'0 1.31 .15',color:'#2E1D14',fontSize:68}))
   const group=make('a-entity',{position:'0 .25 .16'}),count=item.photos.length,layouts=count===3?[[-1.18,1.05,1.5],[0,1.05,1.5],[1.18,1.05,1.5]]:count===2?[[-.86,1.55,1.5],[.86,1.55,1.5]]:[[0,3.05,1.5]]
   item.photos.forEach((src,i)=>{const[x,width,height]=layouts[i];group.append(fitPhoto(src,x,width,height))});panel.append(group)
   panel.append(canvasLabel(item.caption,{width:3.25,height:.9,position:'0 -1.12 .15',color:'#21150F',fontSize:52,weight:'600'}))
-  panel.append(canvasLabel(`${count} ${count===1?'FOTOGRAFIA':'FOTOGRAFIAS AGRUPADAS'}`,{width:3.25,height:.28,position:'0 -1.86 .15',color:'#6B2F10',fontSize:44}));return panel
+  panel.append(canvasLabel(`${count} ${count===1?'FOTOGRAFIA':'FOTOGRAFIAS AGRUPADAS'}`,{width:3.25,height:.25,position:'0 -1.72 .15',color:'#6B2F10',fontSize:42}));addVisitButton(panel);return panel
 }
 
 function createPoemPanel(poem,index,total,sessionTitle){
-  const panel=frame(),pose=panelPosition(index,total);panel.setAttribute('position',pose.position);panel.setAttribute('rotation',pose.rotation)
+  const panel=frame(),pose=panelPosition(index,total);panel.__homePose=pose;panel.setAttribute('position',pose.position);panel.setAttribute('rotation',pose.rotation)
   const poemLineCount=poem.lines.split('\n').length,poemFontSize=poemLineCount>=9?38:poemLineCount>=7?43:54
   panel.append(canvasLabel(`SESSÃO ${currentSession+1}  /  POESIA`,{width:3.25,height:.34,position:'0 1.76 .15',color:'#6B2F10',fontSize:52}));panel.append(canvasLabel('FOLHETO DIGITAL',{width:3.25,height:.45,position:'0 1.3 .15',fontSize:65}))
-  panel.append(make('a-box',{width:'3.05',height:'2.35',depth:'.035',position:'0 -.05 .15',material:'shader:flat;color:#271710'}));panel.append(canvasLabel(poem.lines,{width:2.8,height:1.28,position:'0 .34 .2',color:'#FFF1D2',fontSize:poemFontSize,align:'center',weight:'600'}));panel.append(canvasLabel(poem.author,{width:2.7,height:.35,position:'0 -.88 .2',color:'#F2B769',fontSize:42,align:'center'}));panel.append(canvasLabel(`Poema: ${poem.work}\nPoesia de Uauá`,{width:3.1,height:.7,position:'0 -1.62 .15',color:'#21150F',fontSize:43,align:'center',weight:'600'}));return panel
+  panel.append(make('a-box',{width:'3.05',height:'2.35',depth:'.035',position:'0 -.05 .15',material:'shader:flat;color:#271710'}));panel.append(canvasLabel(poem.lines,{width:2.8,height:1.28,position:'0 .34 .2',color:'#FFF1D2',fontSize:poemFontSize,align:'center',weight:'600'}));panel.append(canvasLabel(poem.author,{width:2.7,height:.35,position:'0 -.88 .2',color:'#F2B769',fontSize:42,align:'center'}));panel.append(canvasLabel(`Poema: ${poem.work}\nPoesia de Uauá`,{width:3.1,height:.55,position:'0 -1.52 .15',color:'#21150F',fontSize:40,align:'center',weight:'600'}));addVisitButton(panel);return panel
 }
 
 function renderSession(){
