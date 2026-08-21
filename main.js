@@ -113,8 +113,14 @@ function installSBS(scene){
   async function requestMotion(){if(typeof DeviceOrientationEvent!=='undefined'&&typeof DeviceOrientationEvent.requestPermission==='function')try{await DeviceOrientationEvent.requestPermission()}catch{}}
   async function enterFullscreen(){document.body.classList.add('pseudo-fullscreen');const request=document.documentElement.requestFullscreen||document.documentElement.webkitRequestFullscreen;try{if(request)await request.call(document.documentElement,{navigationUI:'hide'})}catch{};try{await screen.orientation?.lock?.('landscape')}catch{};const active=Boolean(fullscreenElement());$('#enter-fullscreen').textContent=active?'SAIR DA TELA CHEIA':'MODO AMPLO';return active}
   async function leaveFullscreen(){document.body.classList.remove('pseudo-fullscreen');const exit=document.exitFullscreen||document.webkitExitFullscreen;try{if(fullscreenElement()&&exit)await exit.call(document)}catch{};try{screen.orientation?.unlock?.()}catch{};$('#enter-fullscreen').textContent='TELA CHEIA'}
-  async function activate(){unlockSessionMusic();enabled=true;setOverlay(false);document.body.classList.add('sbs-active');await Promise.allSettled([requestMotion(),enterFullscreen()])}
-  async function deactivate(){enabled=false;document.body.classList.remove('sbs-active');setOverlay(true);await leaveFullscreen()}
+  function showExitControl(){
+    if($('#exit-sbs-control'))return
+    const control=make('a-entity',{id:'exit-sbs-control',position:'0 .62 -2.15'}),target=make('a-plane',{class:'interactive gaze-target',width:'1.75',height:'.5',material:'shader:flat;color:#301C14;opacity:.96;depthTest:false'})
+    control.append(target);control.append(canvasLabel('SAIR DO VR',{width:1.55,height:.3,position:'0 0 .03',color:'#FFF1D2',fontSize:45,align:'center',weight:'700'}));$('#camera').append(control)
+    bindGaze(target,deactivate);target.addEventListener('click',deactivate)
+  }
+  async function activate(){unlockSessionMusic();enabled=true;setOverlay(false);document.body.classList.add('sbs-active');showExitControl();await Promise.allSettled([requestMotion(),enterFullscreen()])}
+  async function deactivate(){if(!enabled)return;enabled=false;$('#exit-sbs-control')?.remove();document.body.classList.remove('sbs-active');setOverlay(true);await leaveFullscreen()}
   $('#enter-vr').addEventListener('click',()=>{unlockSessionMusic();enabled?deactivate():activate()})
   $('#enter-fullscreen').addEventListener('click',async()=>{unlockSessionMusic();if(fullscreenElement()||document.body.classList.contains('pseudo-fullscreen'))await leaveFullscreen();else await enterFullscreen()})
   ;['fullscreenchange','webkitfullscreenchange'].forEach(name=>document.addEventListener(name,()=>{$('#enter-fullscreen').textContent=fullscreenElement()||document.body.classList.contains('pseudo-fullscreen')?'SAIR DA TELA CHEIA':'TELA CHEIA'}))
