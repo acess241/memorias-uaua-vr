@@ -17,8 +17,6 @@ a-scene{position:fixed!important;inset:0!important;width:100%!important;height:1
 .orientation i:after{content:'';position:absolute;width:2px;height:6px;left:12px;top:3px;background:#cbaa76;animation:look 1.8s ease-in-out infinite}
 .reconstruction-note{position:fixed;z-index:6;right:max(14px,env(safe-area-inset-right));bottom:max(18px,env(safe-area-inset-bottom));width:min(390px,calc(100vw - 28px));padding:10px 13px;border:1px solid #c7945555;border-radius:8px;background:#130d0bc7;color:#dfc9a4;font-size:8px;line-height:1.45;letter-spacing:.45px;pointer-events:none;backdrop-filter:blur(7px)}
 .panorama-active .orientation{display:none}
-#leave-panorama{position:fixed;z-index:20;left:50%;bottom:max(88px,calc(env(safe-area-inset-bottom) + 88px));transform:translateX(-50%);min-width:180px;padding:13px 22px;border:1px solid #e0a55c;border-radius:30px;background:#6b351df2;color:#fff1d2;font:700 10px 'DM Sans';letter-spacing:1.5px;cursor:pointer}
-#leave-panorama[hidden],.sbs-active #leave-panorama{display:none}
 @keyframes look{50%{transform:translateX(6px)}}
 #loading{position:fixed;z-index:30;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(circle,#3b2115,#090605 70%);transition:opacity .8s}
 #loading.hide{opacity:0;pointer-events:none}
