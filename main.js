@@ -2,15 +2,15 @@ const sessions = [
   {
     title:'MONUMENTOS',
     items:[
-      {title:'RÉPLICA DO BELO MONTE',photos:['/monumentos/belo-monte-01.jpg','/monumentos/belo-monte-02.jpg','/monumentos/belo-monte-03.jpg'],panorama:'/panoramas/belo-monte.png',caption:'Cenário de Gildemar de Sena que evoca Belo Monte, comunidade de Antônio Conselheiro destruída em 1897.'},
+      {title:'RÉPLICA DO BELO MONTE',photos:['/monumentos/belo-monte-01.jpg','/monumentos/belo-monte-02.jpg','/monumentos/belo-monte-03.jpg'],panorama:'/panoramas/belo-monte.png',caption:'Cenário de Gildemar de Sena que evoca Belo Monte, comunidade de Antônio Conselheiro destruída em 1897. Uauá fez parte dos caminhos militares da Guerra de Canudos.'},
       {title:'AGÊNCIA DOS CORREIOS',photos:['/monumentos/correios.jpg'],panorama:'/panoramas/correios.png',caption:'Registro da antiga agência dos Correios, importante elo de comunicação entre Uauá e outras cidades.'},
-      {title:'CASA DE ROQUE FERREIRA',photos:['/monumentos/casa-roque-01.jpg','/monumentos/casa-roque-02.jpg'],panorama:'/panoramas/casa-roque.png',caption:'Casa relacionada ao combate de 21 de novembro de 1896. O imóvel abrigou tropas republicanas e foi posteriormente demolido.'},
+      {title:'CASA DE ROQUE FERREIRA',photos:['/monumentos/casa-roque-01.jpg','/monumentos/casa-roque-02.jpg'],panorama:'/panoramas/casa-roque.png',caption:'Ligada ao combate de 21 de novembro de 1896, considerado o primeiro confronto da Guerra de Canudos. A casa abrigou tropas republicanas e depois foi demolida.'},
       {title:'ESCOLA JOÃO BORGES DE SÁ',photos:['/monumentos/escola-joao-borges.jpg'],panorama:'/panoramas/escola-joao-borges.png',caption:'Registro da escola municipal ligada à expansão do ensino público na sede de Uauá.'},
       {title:'ESCOLA SENHOR DO BONFIM',photos:['/monumentos/escola-senhor-bonfim.jpg'],panorama:'/panoramas/escola-senhor-bonfim.png',caption:'Estudantes diante do antigo Ginásio Escolar Normal Senhor do Bonfim, parte da memória educacional uauaense.'},
       {title:'IGREJA SÃO JOÃO BATISTA',photos:['/monumentos/igreja-sao-joao-01.jpg','/monumentos/igreja-sao-joao-02.jpg'],panorama:'/panoramas/igreja-sao-joao.png',caption:'A construção da Igreja Matriz começou em 1921. A paróquia foi fundada em 1923.'},
       {title:'PRAÇA DA IGREJA',photos:['/monumentos/praca-igreja.jpg'],panorama:'/panoramas/praca-igreja.png',caption:'Registro das transformações da Praça São João Batista, no centro de Uauá.'},
       {title:'PRIMEIRA ESCOLA DE DATILOGRAFIA',photos:['/monumentos/escola-datilografia.jpg'],panorama:'/panoramas/escola-datilografia.png',caption:'Iniciativa do Padre Osvaldo, a escola foi inaugurada em 1976 e ofereceu formação profissional.'},
-      {title:'PREFEITURA MUNICIPAL DE UAUÁ',photos:['/monumentos/prefeitura.jpg'],panorama:'/panoramas/prefeitura.png',caption:'Sede administrativa de Uauá. O município foi emancipado em 1926 e restaurado definitivamente em 1933.'}
+      {title:'PREFEITURA MUNICIPAL DE UAUÁ',photos:['/monumentos/prefeitura.jpg'],panorama:'/panoramas/prefeitura.png',caption:'Sede administrativa de Uauá. O distrito foi criado em 1905; o município foi emancipado em 1926 e restaurado definitivamente em 1933.'}
     ],
     poem:{author:'GILDEMAR DE SENA',work:'Cordelizando o cordel',lines:'Literatura que vem da rima\nDe fácil compreensão\nQue falam de fatos já ocorridos\nE das façanhas de Lampião'}
   },
@@ -138,17 +138,17 @@ AFRAME.registerComponent('canvas-label',{
 function make(tag,attributes={}){const element=document.createElement(tag);Object.entries(attributes).forEach(([key,value])=>element.setAttribute(key,value));return element}
 function canvasLabel(text,{width=3.4,height=.5,position='0 0 .15',color='#073F73',fontSize=58,align='left',weight='600'}={}){const plane=make('a-plane',{width:String(width),height:String(height),position,material:'shader:flat;transparent:true;opacity:1;color:#fff'});plane.setAttribute('canvas-label',{text,color,fontSize,align,weight});return plane}
 
-function panelPosition(index,total){const angle=index*(360/total),radians=angle*Math.PI/180,radius=6.8;return{position:`${Math.sin(radians)*radius} 3.15 ${-Math.cos(radians)*radius}`,rotation:`0 ${-angle} 0`}}
+function panelPosition(index,total){const angle=index*(360/total),radians=angle*Math.PI/180,radius=7.15;return{position:`${Math.sin(radians)*radius} 3.18 ${-Math.cos(radians)*radius}`,rotation:`0 ${-angle} 0`}}
 function frame(){
   const panel=make('a-entity')
-  panel.append(make('a-box',{width:'3.95',height:'4.65',depth:'.14',material:'shader:flat;color:#052F57'}))
-  panel.append(make('a-box',{width:'3.7',height:'4.4',depth:'.04',position:'0 0 .1',material:'shader:flat;color:#F7FBFF'}))
-  panel.append(make('a-box',{width:'1.25',height:'.1',depth:'.18',position:'0 2.42 .38',material:'shader:flat;color:#FDBA18'}))
+  panel.append(make('a-box',{width:'4.35',height:'5.25',depth:'.14',material:'shader:flat;color:#052F57'}))
+  panel.append(make('a-box',{width:'4.08',height:'4.98',depth:'.04',position:'0 0 .1',material:'shader:flat;color:#F7FBFF'}))
+  panel.append(make('a-box',{width:'1.55',height:'.11',depth:'.18',position:'0 2.72 .38',material:'shader:flat;color:#FDBA18'}))
   return panel
 }
 function addVisitButton(panel,panorama){
-  const target=make('a-plane',{class:'interactive gaze-target',width:'2.15',height:'.36',position:'0 -2.02 .22',material:'shader:flat;color:#0867C7'})
-  const label=canvasLabel('VISITE ESTA ÁREA',{width:1.95,height:.25,position:'0 -2.02 .24',color:'#FFFFFF',fontSize:42,align:'center',weight:'700'})
+  const target=make('a-plane',{class:'interactive gaze-target',width:'2.75',height:'.52',position:'0 -2.25 .22',material:'shader:flat;color:#0867C7'})
+  const label=canvasLabel('VISITE ESTA ÁREA',{width:2.52,height:.34,position:'0 -2.25 .24',color:'#FFFFFF',fontSize:53,align:'center',weight:'700'})
   panel.append(target);panel.append(label);bindGaze(target,()=>enterPanorama(panorama))
 }
 function enterPanorama(panorama){
@@ -181,12 +181,12 @@ function fitPhoto(src,x,maxWidth,maxHeight){const resolvedSrc=assetPath(src),pho
 
 function createPhotoPanel(item,index,total,sessionTitle){
   const panel=frame(),pose=panelPosition(index,total);panel.__homePose=pose;panel.setAttribute('position',pose.position);panel.setAttribute('rotation',pose.rotation)
-  panel.append(canvasLabel(`SESSÃO ${currentSession+1}  /  PAINEL ${String(index+1).padStart(2,'0')}`,{width:3.25,height:.34,position:'0 1.78 .15',color:'#0867C7',fontSize:52}))
-  panel.append(canvasLabel(item.title,{width:3.25,height:.72,position:'0 1.31 .15',color:'#073F73',fontSize:68}))
-  const group=make('a-entity',{position:'0 .25 .16'}),count=item.photos.length,layouts=count===3?[[-1.18,1.05,1.5],[0,1.05,1.5],[1.18,1.05,1.5]]:count===2?[[-.86,1.55,1.5],[.86,1.55,1.5]]:[[0,3.05,1.5]]
+  panel.append(canvasLabel(`SESSÃO ${currentSession+1}  /  PAINEL ${String(index+1).padStart(2,'0')}`,{width:3.6,height:.38,position:'0 2.08 .15',color:'#0867C7',fontSize:58}))
+  panel.append(canvasLabel(item.title,{width:3.6,height:.78,position:'0 1.57 .15',color:'#073F73',fontSize:74}))
+  const group=make('a-entity',{position:'0 .5 .16'}),count=item.photos.length,layouts=count===3?[[-1.25,1.12,1.55],[0,1.12,1.55],[1.25,1.12,1.55]]:count===2?[[-.96,1.72,1.55],[.96,1.72,1.55]]:[[0,3.35,1.6]]
   item.photos.forEach((src,i)=>{const[x,width,height]=layouts[i];group.append(fitPhoto(src,x,width,height))});panel.append(group)
-  panel.append(canvasLabel(item.caption,{width:3.25,height:.9,position:'0 -1.12 .15',color:'#163B5C',fontSize:52,weight:'600'}))
-  panel.append(canvasLabel(`${count} ${count===1?'FOTOGRAFIA':'FOTOGRAFIAS AGRUPADAS'}`,{width:3.25,height:.25,position:'0 -1.72 .15',color:'#0867C7',fontSize:42}));if(item.panorama)addVisitButton(panel,item.panorama);return panel
+  panel.append(canvasLabel(item.caption,{width:3.6,height:1.34,position:'0 -1.18 .15',color:'#163B5C',fontSize:58,weight:'600'}))
+  if(item.panorama)addVisitButton(panel,item.panorama);return panel
 }
 
 function createPoemPanel(poem,index,total,sessionTitle){
@@ -200,7 +200,7 @@ function renderSession(){
   const room=$('#monuments-room'),session=sessions[currentSession],total=session.items.length+1
   while(room.firstChild)room.removeChild(room.firstChild)
   session.items.forEach((item,index)=>room.append(createPhotoPanel(item,index,total,session.title)));room.append(createPoemPanel(session.poem,total-1,total,session.title))
-  $('.identity b').textContent=`MEMÓRIAS DE UAUÁ · ${session.title}`
+  $('.identity b').textContent=`MUSEU PÁTRIA DOS VAGALUMES · ${session.title}`
   room.setAttribute('animation__enter','property:scale;from:.75 .75 .75;to:1 1 1;dur:650;easing:easeOutBack')
   loadSessionMusic()
 }
