@@ -15,6 +15,8 @@ a-scene{position:fixed!important;inset:0!important;width:100%!important;height:1
 .orientation{position:fixed;z-index:5;bottom:max(25px,env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:12px;color:#cbaa76;font-size:8px;letter-spacing:1.8px;pointer-events:none;text-shadow:0 2px 5px #000}
 .orientation i{display:block;width:28px;height:20px;border:1px solid #cbaa76;border-radius:12px;position:relative}
 .orientation i:after{content:'';position:absolute;width:2px;height:6px;left:12px;top:3px;background:#cbaa76;animation:look 1.8s ease-in-out infinite}
+.reconstruction-note{position:fixed;z-index:6;right:max(14px,env(safe-area-inset-right));bottom:max(18px,env(safe-area-inset-bottom));width:min(390px,calc(100vw - 28px));padding:10px 13px;border:1px solid #c7945555;border-radius:8px;background:#130d0bc7;color:#dfc9a4;font-size:8px;line-height:1.45;letter-spacing:.45px;pointer-events:none;backdrop-filter:blur(7px)}
+.panorama-active .orientation{display:none}
 @keyframes look{50%{transform:translateX(6px)}}
 #loading{position:fixed;z-index:30;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(circle,#3b2115,#090605 70%);transition:opacity .8s}
 #loading.hide{opacity:0;pointer-events:none}
@@ -33,5 +35,7 @@ body.pseudo-fullscreen .hud{padding-top:max(10px,env(safe-area-inset-top))}
   #enter-vr{background:#8a4824f2}
   .orientation{bottom:max(82px,calc(env(safe-area-inset-bottom) + 82px));width:100%;justify-content:center}
   .orientation span{font-size:7px}
+  .reconstruction-note{left:12px;right:12px;bottom:max(80px,calc(env(safe-area-inset-bottom) + 80px));width:auto;font-size:7px;padding:8px 10px}
+  .panorama-active .reconstruction-note{bottom:max(12px,env(safe-area-inset-bottom))}
   .sbs-active .hud-actions{display:none}
 }

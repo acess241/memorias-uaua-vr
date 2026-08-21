@@ -2,15 +2,15 @@ const sessions = [
   {
     title:'MONUMENTOS',
     items:[
-      {title:'RÉPLICA DO BELO MONTE',photos:['/monumentos/belo-monte-01.jpg','/monumentos/belo-monte-02.jpg','/monumentos/belo-monte-03.jpg'],caption:'Cenário de Gildemar de Sena que evoca Belo Monte, comunidade de Antônio Conselheiro destruída em 1897.'},
-      {title:'AGÊNCIA DOS CORREIOS',photos:['/monumentos/correios.jpg'],caption:'Registro da antiga agência dos Correios, importante elo de comunicação entre Uauá e outras cidades.'},
-      {title:'CASA DE ROQUE FERREIRA',photos:['/monumentos/casa-roque-01.jpg','/monumentos/casa-roque-02.jpg'],caption:'Casa relacionada ao combate de 21 de novembro de 1896. O imóvel abrigou tropas republicanas e foi posteriormente demolido.'},
-      {title:'ESCOLA JOÃO BORGES DE SÁ',photos:['/monumentos/escola-joao-borges.jpg'],caption:'Registro da escola municipal ligada à expansão do ensino público na sede de Uauá.'},
-      {title:'ESCOLA SENHOR DO BONFIM',photos:['/monumentos/escola-senhor-bonfim.jpg'],caption:'Estudantes diante do antigo Ginásio Escolar Normal Senhor do Bonfim, parte da memória educacional uauaense.'},
-      {title:'IGREJA SÃO JOÃO BATISTA',photos:['/monumentos/igreja-sao-joao-01.jpg','/monumentos/igreja-sao-joao-02.jpg'],caption:'A construção da Igreja Matriz começou em 1921. A paróquia foi fundada em 1923.'},
-      {title:'PRAÇA DA IGREJA',photos:['/monumentos/praca-igreja.jpg'],caption:'Registro das transformações da Praça São João Batista, no centro de Uauá.'},
-      {title:'PRIMEIRA ESCOLA DE DATILOGRAFIA',photos:['/monumentos/escola-datilografia.jpg'],caption:'Iniciativa do Padre Osvaldo, a escola foi inaugurada em 1976 e ofereceu formação profissional.'},
-      {title:'PREFEITURA MUNICIPAL DE UAUÁ',photos:['/monumentos/prefeitura.jpg'],caption:'Sede administrativa de Uauá. O município foi emancipado em 1926 e restaurado definitivamente em 1933.'}
+      {title:'RÉPLICA DO BELO MONTE',photos:['/monumentos/belo-monte-01.jpg','/monumentos/belo-monte-02.jpg','/monumentos/belo-monte-03.jpg'],panorama:'/panoramas/belo-monte.png',caption:'Cenário de Gildemar de Sena que evoca Belo Monte, comunidade de Antônio Conselheiro destruída em 1897.'},
+      {title:'AGÊNCIA DOS CORREIOS',photos:['/monumentos/correios.jpg'],panorama:'/panoramas/correios.png',caption:'Registro da antiga agência dos Correios, importante elo de comunicação entre Uauá e outras cidades.'},
+      {title:'CASA DE ROQUE FERREIRA',photos:['/monumentos/casa-roque-01.jpg','/monumentos/casa-roque-02.jpg'],panorama:'/panoramas/casa-roque.png',caption:'Casa relacionada ao combate de 21 de novembro de 1896. O imóvel abrigou tropas republicanas e foi posteriormente demolido.'},
+      {title:'ESCOLA JOÃO BORGES DE SÁ',photos:['/monumentos/escola-joao-borges.jpg'],panorama:'/panoramas/escola-joao-borges.png',caption:'Registro da escola municipal ligada à expansão do ensino público na sede de Uauá.'},
+      {title:'ESCOLA SENHOR DO BONFIM',photos:['/monumentos/escola-senhor-bonfim.jpg'],panorama:'/panoramas/escola-senhor-bonfim.png',caption:'Estudantes diante do antigo Ginásio Escolar Normal Senhor do Bonfim, parte da memória educacional uauaense.'},
+      {title:'IGREJA SÃO JOÃO BATISTA',photos:['/monumentos/igreja-sao-joao-01.jpg','/monumentos/igreja-sao-joao-02.jpg'],panorama:'/panoramas/igreja-sao-joao.png',caption:'A construção da Igreja Matriz começou em 1921. A paróquia foi fundada em 1923.'},
+      {title:'PRAÇA DA IGREJA',photos:['/monumentos/praca-igreja.jpg'],panorama:'/panoramas/praca-igreja.png',caption:'Registro das transformações da Praça São João Batista, no centro de Uauá.'},
+      {title:'PRIMEIRA ESCOLA DE DATILOGRAFIA',photos:['/monumentos/escola-datilografia.jpg'],panorama:'/panoramas/escola-datilografia.png',caption:'Iniciativa do Padre Osvaldo, a escola foi inaugurada em 1976 e ofereceu formação profissional.'},
+      {title:'PREFEITURA MUNICIPAL DE UAUÁ',photos:['/monumentos/prefeitura.jpg'],panorama:'/panoramas/prefeitura.png',caption:'Sede administrativa de Uauá. O município foi emancipado em 1926 e restaurado definitivamente em 1933.'}
     ],
     poem:{author:'GILDEMAR DE SENA',work:'Cordelizando o cordel',lines:'Literatura que vem da rima\nDe fácil compreensão\nQue falam de fatos já ocorridos\nE das façanhas de Lampião'}
   },
@@ -144,22 +144,34 @@ function frame(){
   panel.append(make('a-box',{width:'1.25',height:'.1',depth:'.18',position:'0 2.42 .38',material:'shader:flat;color:#E6A85F'}))
   return panel
 }
-function addVisitButton(panel){
+function addVisitButton(panel,panorama){
   const target=make('a-plane',{class:'interactive gaze-target',width:'2.15',height:'.36',position:'0 -2.02 .22',material:'shader:flat;color:#7B3F20'})
   const label=canvasLabel('VISITE ESTA ÁREA',{width:1.95,height:.25,position:'0 -2.02 .24',color:'#FFF1D2',fontSize:42,align:'center',weight:'700'})
-  panel.append(target);panel.append(label);bindGaze(target,()=>togglePanelVisit(panel,label))
+  panel.append(target);panel.append(label);bindGaze(target,()=>enterPanorama(panorama))
 }
-function togglePanelVisit(panel,label){
-  const room=$('#monuments-room'),visiting=panel.dataset.visiting==='true'
-  if(visiting){
-    Array.from(room.children).forEach(item=>item.setAttribute('visible','true'))
-    panel.setAttribute('position',panel.__homePose.position);panel.setAttribute('rotation',panel.__homePose.rotation);panel.dataset.visiting='false'
-    label.setAttribute('canvas-label','text','VISITE ESTA ÁREA');$('#ceiling-controls').setAttribute('visible','true')
-  }else{
-    Array.from(room.children).forEach(item=>item.setAttribute('visible',item===panel?'true':'false'))
-    panel.setAttribute('position','0 2.75 -4.2');panel.setAttribute('rotation','0 0 0');panel.dataset.visiting='true'
-    label.setAttribute('canvas-label','text','VOLTAR À SALA');$('#ceiling-controls').setAttribute('visible','false')
-  }
+function enterPanorama(panorama){
+  if($('#visit-panorama'))return
+  const scene=$('a-scene'),rig=$('#rig'),sky=make('a-sky',{id:'visit-panorama',src:assetPath(panorama),radius:'45',rotation:'0 -90 0',material:'shader:flat;side:back'})
+  Array.from(scene.children).forEach(element=>{
+    if(element===rig||element.tagName==='A-ASSETS')return
+    element.dataset.visitVisibility=String(element.getAttribute('visible')!==false)
+    element.setAttribute('visible','false')
+  })
+  scene.append(sky)
+  const camera=$('#camera'),back=make('a-entity',{id:'visit-back',position:'0 -1.12 -3'})
+  const target=make('a-plane',{class:'interactive gaze-target',width:'2.2',height:'.42',material:'shader:flat;color:#6B351D;opacity:.94'})
+  back.append(target);back.append(canvasLabel('VOLTAR À SALA',{width:2,height:.27,position:'0 0 .02',color:'#FFF1D2',fontSize:43,align:'center',weight:'700'}));camera.append(back)
+  bindGaze(target,exitPanorama)
+  document.body.classList.add('panorama-active')
+}
+function exitPanorama(){
+  $('#visit-panorama')?.remove();$('#visit-back')?.remove()
+  const scene=$('a-scene'),rig=$('#rig')
+  Array.from(scene.children).forEach(element=>{
+    if(element===rig||element.tagName==='A-ASSETS'||element.id==='visit-panorama')return
+    if(element.dataset.visitVisibility!==undefined){element.setAttribute('visible',element.dataset.visitVisibility==='true');delete element.dataset.visitVisibility}
+  })
+  document.body.classList.remove('panorama-active')
 }
 function fitPhoto(src,x,maxWidth,maxHeight){const resolvedSrc=assetPath(src),photo=make('a-image',{src:resolvedSrc,width:String(maxWidth),height:String(maxHeight),position:`${x} 0 0`,material:'shader:flat'}),image=new Image();image.onload=()=>{const ratio=image.naturalWidth/image.naturalHeight,box=maxWidth/maxHeight;if(ratio>box){photo.setAttribute('width',maxWidth);photo.setAttribute('height',maxWidth/ratio)}else{photo.setAttribute('height',maxHeight);photo.setAttribute('width',maxHeight*ratio)}};image.src=resolvedSrc;return photo}
 
@@ -170,14 +182,14 @@ function createPhotoPanel(item,index,total,sessionTitle){
   const group=make('a-entity',{position:'0 .25 .16'}),count=item.photos.length,layouts=count===3?[[-1.18,1.05,1.5],[0,1.05,1.5],[1.18,1.05,1.5]]:count===2?[[-.86,1.55,1.5],[.86,1.55,1.5]]:[[0,3.05,1.5]]
   item.photos.forEach((src,i)=>{const[x,width,height]=layouts[i];group.append(fitPhoto(src,x,width,height))});panel.append(group)
   panel.append(canvasLabel(item.caption,{width:3.25,height:.9,position:'0 -1.12 .15',color:'#21150F',fontSize:52,weight:'600'}))
-  panel.append(canvasLabel(`${count} ${count===1?'FOTOGRAFIA':'FOTOGRAFIAS AGRUPADAS'}`,{width:3.25,height:.25,position:'0 -1.72 .15',color:'#6B2F10',fontSize:42}));addVisitButton(panel);return panel
+  panel.append(canvasLabel(`${count} ${count===1?'FOTOGRAFIA':'FOTOGRAFIAS AGRUPADAS'}`,{width:3.25,height:.25,position:'0 -1.72 .15',color:'#6B2F10',fontSize:42}));if(item.panorama)addVisitButton(panel,item.panorama);return panel
 }
 
 function createPoemPanel(poem,index,total,sessionTitle){
   const panel=frame(),pose=panelPosition(index,total);panel.__homePose=pose;panel.setAttribute('position',pose.position);panel.setAttribute('rotation',pose.rotation)
   const poemLineCount=poem.lines.split('\n').length,poemFontSize=poemLineCount>=9?38:poemLineCount>=7?43:54
   panel.append(canvasLabel(`SESSÃO ${currentSession+1}  /  POESIA`,{width:3.25,height:.34,position:'0 1.76 .15',color:'#6B2F10',fontSize:52}));panel.append(canvasLabel('FOLHETO DIGITAL',{width:3.25,height:.45,position:'0 1.3 .15',fontSize:65}))
-  panel.append(make('a-box',{width:'3.05',height:'2.35',depth:'.035',position:'0 -.05 .15',material:'shader:flat;color:#271710'}));panel.append(canvasLabel(poem.lines,{width:2.8,height:1.28,position:'0 .34 .2',color:'#FFF1D2',fontSize:poemFontSize,align:'center',weight:'600'}));panel.append(canvasLabel(poem.author,{width:2.7,height:.35,position:'0 -.88 .2',color:'#F2B769',fontSize:42,align:'center'}));panel.append(canvasLabel(`Poema: ${poem.work}\nPoesia de Uauá`,{width:3.1,height:.55,position:'0 -1.52 .15',color:'#21150F',fontSize:40,align:'center',weight:'600'}));addVisitButton(panel);return panel
+  panel.append(make('a-box',{width:'3.05',height:'2.35',depth:'.035',position:'0 -.05 .15',material:'shader:flat;color:#271710'}));panel.append(canvasLabel(poem.lines,{width:2.8,height:1.28,position:'0 .34 .2',color:'#FFF1D2',fontSize:poemFontSize,align:'center',weight:'600'}));panel.append(canvasLabel(poem.author,{width:2.7,height:.35,position:'0 -.88 .2',color:'#F2B769',fontSize:42,align:'center'}));panel.append(canvasLabel(`Poema: ${poem.work}\nPoesia de Uauá`,{width:3.1,height:.55,position:'0 -1.52 .15',color:'#21150F',fontSize:40,align:'center',weight:'600'}));return panel
 }
 
 function renderSession(){
