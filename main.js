@@ -158,11 +158,12 @@ function enterPanorama(panorama){
     element.setAttribute('visible','false')
   })
   scene.append(sky)
-  const camera=$('#camera'),back=make('a-entity',{id:'visit-back',position:'0 -1.12 -3'})
-  const target=make('a-plane',{class:'interactive gaze-target',width:'2.2',height:'.42',material:'shader:flat;color:#6B351D;opacity:.94'})
-  back.append(target);back.append(canvasLabel('VOLTAR À SALA',{width:2,height:.27,position:'0 0 .02',color:'#FFF1D2',fontSize:43,align:'center',weight:'700'}));camera.append(back)
-  bindGaze(target,exitPanorama)
+  const camera=$('#camera'),back=make('a-entity',{id:'visit-back',position:'0 -.48 -2.15'})
+  const target=make('a-plane',{class:'interactive gaze-target',width:'2.45',height:'.58',material:'shader:flat;color:#6B351D;opacity:.98;depthTest:false'})
+  back.append(target);back.append(canvasLabel('VOLTAR À SALA',{width:2.2,height:.34,position:'0 0 .03',color:'#FFF1D2',fontSize:48,align:'center',weight:'700'}));camera.append(back)
+  bindGaze(target,exitPanorama);target.addEventListener('click',exitPanorama)
   document.body.classList.add('panorama-active')
+  $('#leave-panorama').hidden=false
 }
 function exitPanorama(){
   $('#visit-panorama')?.remove();$('#visit-back')?.remove()
@@ -172,6 +173,7 @@ function exitPanorama(){
     if(element.dataset.visitVisibility!==undefined){element.setAttribute('visible',element.dataset.visitVisibility==='true');delete element.dataset.visitVisibility}
   })
   document.body.classList.remove('panorama-active')
+  $('#leave-panorama').hidden=true
 }
 function fitPhoto(src,x,maxWidth,maxHeight){const resolvedSrc=assetPath(src),photo=make('a-image',{src:resolvedSrc,width:String(maxWidth),height:String(maxHeight),position:`${x} 0 0`,material:'shader:flat'}),image=new Image();image.onload=()=>{const ratio=image.naturalWidth/image.naturalHeight,box=maxWidth/maxHeight;if(ratio>box){photo.setAttribute('width',maxWidth);photo.setAttribute('height',maxWidth/ratio)}else{photo.setAttribute('height',maxHeight);photo.setAttribute('width',maxHeight*ratio)}};image.src=resolvedSrc;return photo}
 
@@ -209,4 +211,4 @@ function createColumns(){const columns=$('#columns');for(let i=0;i<12;i++){const
 
 function createCeilingLabels(){const controls=$('#ceiling-controls');controls.append(canvasLabel('SESSÃO\nANTERIOR',{width:1.25,height:.62,position:'-1.5 .08 .04',color:'#FFF0D2',fontSize:50,align:'center'}));const musicLabel=canvasLabel('PAUSAR\nMÚSICA',{width:1.25,height:.62,position:'0 .08 .04',color:'#FFF0D2',fontSize:50,align:'center'});musicLabel.id='music-control-label';controls.append(musicLabel);controls.append(canvasLabel('PRÓXIMA\nSESSÃO',{width:1.25,height:.62,position:'1.5 .08 .04',color:'#FFF0D2',fontSize:50,align:'center'}));controls.append(canvasLabel('FIXE O OLHAR PARA NAVEGAR',{width:3.1,height:.32,position:'0 -1.18 .03',color:'#CFA467',fontSize:45,align:'center'}))}
 
-window.addEventListener('DOMContentLoaded',()=>{createColumns();createCeilingLabels();renderSession();document.addEventListener('pointerdown',unlockSessionMusic,{once:true});bindGaze($('#previous-session-target'),previousSession);bindGaze($('#music-toggle-target'),toggleSessionMusic);bindGaze($('#next-session-target'),nextSession);const scene=$('a-scene');scene.addEventListener('loaded',()=>{scene.renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.5));installSBS(scene);setTimeout(()=>$('#loading').classList.add('hide'),450)})})
+window.addEventListener('DOMContentLoaded',()=>{createColumns();createCeilingLabels();renderSession();document.addEventListener('pointerdown',unlockSessionMusic,{once:true});$('#leave-panorama').addEventListener('click',exitPanorama);bindGaze($('#previous-session-target'),previousSession);bindGaze($('#music-toggle-target'),toggleSessionMusic);bindGaze($('#next-session-target'),nextSession);const scene=$('a-scene');scene.addEventListener('loaded',()=>{scene.renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.5));installSBS(scene);setTimeout(()=>$('#loading').classList.add('hide'),450)})})
