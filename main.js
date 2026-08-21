@@ -127,9 +127,9 @@ AFRAME.registerComponent('canvas-label',{
   schema:{text:{default:''},color:{default:'#073F73'},fontSize:{type:'int',default:58},align:{default:'left'},weight:{default:'600'}},
   update(){
     const planeWidth=Number(this.el.getAttribute('width'))||3.4,planeHeight=Number(this.el.getAttribute('height'))||.5
-    const canvas=document.createElement('canvas');canvas.width=1024;canvas.height=Math.max(80,Math.round(1024*planeHeight/planeWidth));const context=canvas.getContext('2d');context.clearRect(0,0,canvas.width,canvas.height);context.fillStyle=this.data.color;context.font=`${this.data.weight} ${this.data.fontSize}px Montserrat, Arial, sans-serif`;context.textBaseline='middle'
-    const maxWidth=920,lines=[];this.data.text.split('\n').forEach(paragraph=>{const words=paragraph.split(' ');let line='';words.forEach(word=>{const test=line?`${line} ${word}`:word;if(context.measureText(test).width>maxWidth&&line){lines.push(line);line=word}else line=test});lines.push(line)})
-    const lineHeight=this.data.fontSize*1.28,total=lineHeight*lines.length,start=canvas.height/2-total/2+lineHeight/2;context.textAlign=this.data.align;const x=this.data.align==='center'?512:this.data.align==='right'?972:52;lines.forEach((line,index)=>context.fillText(line,x,start+index*lineHeight))
+    const canvas=document.createElement('canvas'),resolution=1.5;canvas.width=1536;canvas.height=Math.max(120,Math.round(1536*planeHeight/planeWidth));const context=canvas.getContext('2d');context.clearRect(0,0,canvas.width,canvas.height);context.fillStyle=this.data.color;context.font=`${this.data.weight} ${this.data.fontSize*resolution}px Arial, sans-serif`;context.textBaseline='middle'
+    const maxWidth=1380,lines=[];this.data.text.split('\n').forEach(paragraph=>{const words=paragraph.split(' ');let line='';words.forEach(word=>{const test=line?`${line} ${word}`:word;if(context.measureText(test).width>maxWidth&&line){lines.push(line);line=word}else line=test});lines.push(line)})
+    const lineHeight=this.data.fontSize*1.28*resolution,total=lineHeight*lines.length,start=canvas.height/2-total/2+lineHeight/2;context.textAlign=this.data.align;const x=this.data.align==='center'?768:this.data.align==='right'?1458:78;lines.forEach((line,index)=>context.fillText(line,x,start+index*lineHeight))
     if(this.texture)this.texture.dispose();this.texture=new THREE.CanvasTexture(canvas);this.texture.colorSpace=THREE.SRGBColorSpace;this.texture.needsUpdate=true
     const apply=()=>{const mesh=this.el.getObject3D('mesh');if(!mesh)return;mesh.material.map=this.texture;mesh.material.color.set('#ffffff');mesh.material.transparent=true;mesh.material.needsUpdate=true};apply();this.el.addEventListener('object3dset',apply,{once:true})
   },
@@ -149,7 +149,7 @@ function frame(){
 }
 function addVisitButton(panel,panorama){
   const target=make('a-plane',{class:'interactive gaze-target',width:'2.75',height:'.52',position:'0 -2.25 .22',material:'shader:flat;color:#0867C7'})
-  const label=canvasLabel('VISITE ESTA ÁREA',{width:2.52,height:.34,position:'0 -2.25 .24',color:'#FFFFFF',fontSize:53,align:'center',weight:'700'})
+  const label=canvasLabel('VISITE ESTA ÁREA',{width:2.52,height:.38,position:'0 -2.25 .24',color:'#FFFFFF',fontSize:64,align:'center',weight:'700'})
   panel.append(target);panel.append(label);bindGaze(target,()=>enterPanorama(panorama))
 }
 function enterPanorama(panorama){
@@ -184,11 +184,11 @@ function fitPhoto(src,x,maxWidth,maxHeight){const resolvedSrc=assetPath(src),pho
 
 function createPhotoPanel(item,index,total,sessionTitle){
   const panel=frame(),pose=panelPosition(index,total);panel.__homePose=pose;panel.setAttribute('position',pose.position);panel.setAttribute('rotation',pose.rotation)
-  panel.append(canvasLabel(`SESSÃO ${currentSession+1}  /  PAINEL ${String(index+1).padStart(2,'0')}`,{width:3.6,height:.38,position:'0 2.08 .15',color:'#0867C7',fontSize:58}))
-  panel.append(canvasLabel(item.title,{width:3.6,height:.78,position:'0 1.57 .15',color:'#073F73',fontSize:74}))
+  panel.append(canvasLabel(`SESSÃO ${currentSession+1}  /  PAINEL ${String(index+1).padStart(2,'0')}`,{width:3.6,height:.42,position:'0 2.08 .15',color:'#0867C7',fontSize:66,weight:'700'}))
+  panel.append(canvasLabel(item.title,{width:3.6,height:.84,position:'0 1.57 .15',color:'#073F73',fontSize:82,weight:'700'}))
   const group=make('a-entity',{position:'0 .5 .16'}),count=item.photos.length,layouts=count===3?[[-1.25,1.12,1.55],[0,1.12,1.55],[1.25,1.12,1.55]]:count===2?[[-.96,1.72,1.55],[.96,1.72,1.55]]:[[0,3.35,1.6]]
   item.photos.forEach((src,i)=>{const[x,width,height]=layouts[i];group.append(fitPhoto(src,x,width,height))});panel.append(group)
-  panel.append(canvasLabel(item.caption,{width:3.6,height:1.34,position:'0 -1.18 .15',color:'#163B5C',fontSize:58,weight:'600'}))
+  panel.append(canvasLabel(item.caption,{width:3.6,height:1.48,position:'0 -1.15 .15',color:'#0B3152',fontSize:62,weight:'700'}))
   if(item.panorama)addVisitButton(panel,item.panorama);return panel
 }
 
@@ -214,10 +214,10 @@ function bindGaze(target,action){let timer=null,cooldown=false;target.addEventLi
 
 function createColumns(){const columns=$('#columns');for(let i=0;i<12;i++){const angle=i*30,r=angle*Math.PI/180,e=make('a-entity',{position:`${Math.sin(r)*9.45} 0 ${Math.cos(r)*9.45}`});e.innerHTML='<a-cylinder radius=".18" height="5.65" position="0 2.85 0" material="color:#0B67C8;roughness:.88" segments-radial="12"></a-cylinder><a-cylinder radius=".34" height=".14" position="0 .07 0" material="color:#FDBA18"></a-cylinder>';columns.append(e)}}
 
-function createCeilingLabels(){const controls=$('#ceiling-controls');controls.append(canvasLabel('SESSÃO\nANTERIOR',{width:1.38,height:.72,position:'-1.55 .12 .16',color:'#FFFFFF',fontSize:58,align:'center'}));const musicLabel=canvasLabel('PAUSAR\nMÚSICA',{width:1.38,height:.72,position:'0 .12 .16',color:'#FFFFFF',fontSize:58,align:'center'});musicLabel.id='music-control-label';controls.append(musicLabel);controls.append(canvasLabel('PRÓXIMA\nSESSÃO',{width:1.38,height:.72,position:'1.55 .12 .16',color:'#FFFFFF',fontSize:58,align:'center'}));controls.append(canvasLabel('FIXE O OLHAR PARA NAVEGAR',{width:3.65,height:.38,position:'0 -.97 .14',color:'#073F73',fontSize:52,align:'center',weight:'700'}))}
+function createCeilingLabels(){const controls=$('#ceiling-controls');controls.append(canvasLabel('SESSÃO\nANTERIOR',{width:1.42,height:.8,position:'-1.55 .12 .16',color:'#FFFFFF',fontSize:72,align:'center',weight:'700'}));const musicLabel=canvasLabel('PAUSAR\nMÚSICA',{width:1.42,height:.8,position:'0 .12 .16',color:'#FFFFFF',fontSize:72,align:'center',weight:'700'});musicLabel.id='music-control-label';controls.append(musicLabel);controls.append(canvasLabel('PRÓXIMA\nSESSÃO',{width:1.42,height:.8,position:'1.55 .12 .16',color:'#FFFFFF',fontSize:72,align:'center',weight:'700'}));controls.append(canvasLabel('FIXE O OLHAR PARA NAVEGAR',{width:3.75,height:.44,position:'0 -.97 .14',color:'#073F73',fontSize:62,align:'center',weight:'700'}))}
 function createExperienceExit(){
   const control=make('a-entity',{id:'experience-exit',position:'0 2.7 -7.2',rotation:'0 0 0',visible:'false'}),target=make('a-plane',{class:'interactive gaze-target',width:'2.35',height:'.62',material:'shader:flat;color:#073F73;opacity:.98;depthTest:false'})
-  control.append(target);control.append(canvasLabel('SAIR DA EXPERIÊNCIA',{width:2.12,height:.38,position:'0 0 .03',color:'#FFFFFF',fontSize:48,align:'center',weight:'700'}));$('a-scene').append(control);bindGaze(target,exitExperience)
+  control.append(target);control.append(canvasLabel('SAIR DA EXPERIÊNCIA',{width:2.12,height:.44,position:'0 0 .03',color:'#FFFFFF',fontSize:62,align:'center',weight:'700'}));$('a-scene').append(control);bindGaze(target,exitExperience)
 }
 
 window.addEventListener('DOMContentLoaded',()=>{createColumns();createCeilingLabels();createExperienceExit();renderSession();document.addEventListener('pointerdown',unlockSessionMusic,{once:true});bindGaze($('#previous-session-target'),previousSession);bindGaze($('#music-toggle-target'),toggleSessionMusic);bindGaze($('#next-session-target'),nextSession);const scene=$('a-scene');scene.addEventListener('loaded',()=>{scene.renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.5));installSBS(scene);setTimeout(()=>$('#loading').classList.add('hide'),450)})})
