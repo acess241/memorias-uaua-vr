@@ -110,7 +110,7 @@ function installSBS(scene){
     renderer.setScissor(leftWidth,0,rightWidth,size.y);renderer.setViewport(leftWidth,0,rightWidth,size.y);originalRender(scene3D,stereo.cameraR)
     renderer.setScissorTest(false);renderer.setViewport(0,0,size.x,size.y)
   }
-  function setOverlay(visible){$('.hud').style.display=visible?'flex':'none';$('.orientation').style.display=visible?'flex':'none'}
+  function setOverlay(visible){$('.hud').style.display='flex';$('.identity').style.display=visible?'flex':'none';$('.orientation').style.display=visible?'flex':'none';$('#enter-fullscreen').style.display=visible?'block':'none';$('#enter-vr').textContent=visible?'ATIVAR VR · SBS':'DESATIVAR VR · SBS'}
   const fullscreenElement=()=>document.fullscreenElement||document.webkitFullscreenElement
   async function requestMotion(){if(typeof DeviceOrientationEvent!=='undefined'&&typeof DeviceOrientationEvent.requestPermission==='function')try{await DeviceOrientationEvent.requestPermission()}catch{}}
   async function enterFullscreen(){document.body.classList.add('pseudo-fullscreen');const request=document.documentElement.requestFullscreen||document.documentElement.webkitRequestFullscreen;try{if(request)await request.call(document.documentElement,{navigationUI:'hide'})}catch{};try{await screen.orientation?.lock?.('landscape')}catch{};const active=Boolean(fullscreenElement());$('#enter-fullscreen').textContent=active?'SAIR DA TELA CHEIA':'MODO AMPLO';return active}
@@ -121,7 +121,6 @@ function installSBS(scene){
   $('#enter-vr').addEventListener('click',()=>{unlockSessionMusic();enabled?deactivate():activate()})
   $('#enter-fullscreen').addEventListener('click',async()=>{unlockSessionMusic();if(fullscreenElement()||document.body.classList.contains('pseudo-fullscreen'))await leaveFullscreen();else await enterFullscreen()})
   ;['fullscreenchange','webkitfullscreenchange'].forEach(name=>document.addEventListener(name,()=>{$('#enter-fullscreen').textContent=fullscreenElement()||document.body.classList.contains('pseudo-fullscreen')?'SAIR DA TELA CHEIA':'TELA CHEIA'}))
-  window.addEventListener('keydown',event=>{if(event.key==='Escape'&&enabled)deactivate()})
 }
 AFRAME.registerComponent('canvas-label',{
   schema:{text:{default:''},color:{default:'#073F73'},fontSize:{type:'int',default:58},align:{default:'left'},weight:{default:'600'}},
@@ -173,11 +172,11 @@ function exitPanorama(){
     if(element.dataset.visitVisibility!==undefined){element.setAttribute('visible',element.dataset.visitVisibility==='true');delete element.dataset.visitVisibility}
   })
   $('#camera').setAttribute('fov','72')
+  $('#experience-exit').setAttribute('visible','false')
   document.body.classList.remove('panorama-active')
 }
 async function exitExperience(){
   if($('#visit-panorama'))exitPanorama()
-  await leaveSBS()
   $('#experience-exit').setAttribute('visible','false')
 }
 function fitPhoto(src,x,maxWidth,maxHeight){const resolvedSrc=assetPath(src),photo=make('a-image',{src:resolvedSrc,width:String(maxWidth),height:String(maxHeight),position:`${x} 0 0`,material:'shader:flat'}),image=new Image();image.onload=()=>{const ratio=image.naturalWidth/image.naturalHeight,box=maxWidth/maxHeight;if(ratio>box){photo.setAttribute('width',maxWidth);photo.setAttribute('height',maxWidth/ratio)}else{photo.setAttribute('height',maxHeight);photo.setAttribute('width',maxHeight*ratio)}};image.src=resolvedSrc;return photo}
@@ -216,7 +215,7 @@ function createColumns(){const columns=$('#columns');for(let i=0;i<12;i++){const
 
 function createCeilingLabels(){const controls=$('#ceiling-controls');controls.append(canvasLabel('SESSÃO\nANTERIOR',{width:1.38,height:.72,position:'-1.55 .12 .16',color:'#FFFFFF',fontSize:58,align:'center'}));const musicLabel=canvasLabel('PAUSAR\nMÚSICA',{width:1.38,height:.72,position:'0 .12 .16',color:'#FFFFFF',fontSize:58,align:'center'});musicLabel.id='music-control-label';controls.append(musicLabel);controls.append(canvasLabel('PRÓXIMA\nSESSÃO',{width:1.38,height:.72,position:'1.55 .12 .16',color:'#FFFFFF',fontSize:58,align:'center'}));controls.append(canvasLabel('FIXE O OLHAR PARA NAVEGAR',{width:3.65,height:.38,position:'0 -.97 .14',color:'#073F73',fontSize:52,align:'center',weight:'700'}))}
 function createExperienceExit(){
-  const control=make('a-entity',{id:'experience-exit',position:'5.7 2.65 -5.7',rotation:'0 -45 0',visible:'false'}),target=make('a-plane',{class:'interactive gaze-target',width:'2.35',height:'.62',material:'shader:flat;color:#073F73;opacity:.98'})
+  const control=make('a-entity',{id:'experience-exit',position:'0 2.7 -7.2',rotation:'0 0 0',visible:'false'}),target=make('a-plane',{class:'interactive gaze-target',width:'2.35',height:'.62',material:'shader:flat;color:#073F73;opacity:.98;depthTest:false'})
   control.append(target);control.append(canvasLabel('SAIR DA EXPERIÊNCIA',{width:2.12,height:.38,position:'0 0 .03',color:'#FFFFFF',fontSize:48,align:'center',weight:'700'}));$('a-scene').append(control);bindGaze(target,exitExperience)
 }
 

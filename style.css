@@ -38,5 +38,6 @@ body.pseudo-fullscreen .hud{padding-top:max(10px,env(safe-area-inset-top))}
   .orientation span{font-size:7px}
   .reconstruction-note{left:12px;right:12px;bottom:max(80px,calc(env(safe-area-inset-bottom) + 80px));width:auto;font-size:7px;padding:8px 10px}
   .panorama-active .reconstruction-note{bottom:max(12px,env(safe-area-inset-bottom))}
-  .sbs-active .hud-actions{display:none}
+  .sbs-active .hud-actions{display:block;left:auto;right:max(12px,env(safe-area-inset-right));width:min(250px,44vw)}
+  .sbs-active #enter-vr{width:100%}
 }
