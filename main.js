@@ -68,6 +68,7 @@ const sessions = [
 
 let currentSession=0
 let leaveSBS=async()=>{}
+let sbsActive=false
 const $=selector=>document.querySelector(selector)
 const assetPath=path=>`${import.meta.env.BASE_URL}${path.replace(/^\/+/, '')}`
 const sessionAudio=new Audio()
@@ -99,7 +100,7 @@ function toggleSessionMusic(){
 
 function installSBS(scene){
   const renderer=scene.renderer,originalRender=renderer.render.bind(renderer),size=new THREE.Vector2(),stereo=new THREE.StereoCamera()
-  stereo.eyeSep=.064
+  stereo.eyeSep=0
   stereo.aspect=.5
   let enabled=false
   renderer.render=function(scene3D,camera){
@@ -115,8 +116,8 @@ function installSBS(scene){
   async function requestMotion(){if(typeof DeviceOrientationEvent!=='undefined'&&typeof DeviceOrientationEvent.requestPermission==='function')try{await DeviceOrientationEvent.requestPermission()}catch{}}
   async function enterFullscreen(){document.body.classList.add('pseudo-fullscreen');const request=document.documentElement.requestFullscreen||document.documentElement.webkitRequestFullscreen;try{if(request)await request.call(document.documentElement,{navigationUI:'hide'})}catch{};try{await screen.orientation?.lock?.('landscape')}catch{};const active=Boolean(fullscreenElement());$('#enter-fullscreen').textContent=active?'SAIR DA TELA CHEIA':'MODO AMPLO';return active}
   async function leaveFullscreen(){document.body.classList.remove('pseudo-fullscreen');const exit=document.exitFullscreen||document.webkitExitFullscreen;try{if(fullscreenElement()&&exit)await exit.call(document)}catch{};try{screen.orientation?.unlock?.()}catch{};$('#enter-fullscreen').textContent='TELA CHEIA'}
-  async function activate(){unlockSessionMusic();enabled=true;setOverlay(false);document.body.classList.add('sbs-active');$('#experience-exit').setAttribute('visible','false');await Promise.allSettled([requestMotion(),enterFullscreen()])}
-  async function deactivate(){if(!enabled)return;enabled=false;document.body.classList.remove('sbs-active');setOverlay(true);$('#experience-exit').setAttribute('visible','false');await leaveFullscreen()}
+  async function activate(){unlockSessionMusic();enabled=true;sbsActive=true;$('#camera').setAttribute('fov','64');setOverlay(false);document.body.classList.add('sbs-active');$('#experience-exit').setAttribute('visible','false');await Promise.allSettled([requestMotion(),enterFullscreen()])}
+  async function deactivate(){if(!enabled)return;enabled=false;sbsActive=false;$('#camera').setAttribute('fov','72');document.body.classList.remove('sbs-active');setOverlay(true);$('#experience-exit').setAttribute('visible','false');await leaveFullscreen()}
   leaveSBS=deactivate
   $('#enter-vr').addEventListener('click',()=>{unlockSessionMusic();enabled?deactivate():activate()})
   $('#enter-fullscreen').addEventListener('click',async()=>{unlockSessionMusic();if(fullscreenElement()||document.body.classList.contains('pseudo-fullscreen'))await leaveFullscreen();else await enterFullscreen()})
@@ -160,7 +161,7 @@ function enterPanorama(panorama){
     element.setAttribute('visible','false')
   })
   scene.append(sky)
-  $('#camera').setAttribute('fov','82')
+  $('#camera').setAttribute('fov',sbsActive?'72':'82')
   $('#experience-exit').setAttribute('visible','true')
   document.body.classList.add('panorama-active')
 }
@@ -171,7 +172,7 @@ function exitPanorama(){
     if(element===rig||element.tagName==='A-ASSETS'||element.id==='visit-panorama')return
     if(element.dataset.visitVisibility!==undefined){element.setAttribute('visible',element.dataset.visitVisibility==='true');delete element.dataset.visitVisibility}
   })
-  $('#camera').setAttribute('fov','72')
+  $('#camera').setAttribute('fov',sbsActive?'64':'72')
   $('#experience-exit').setAttribute('visible','false')
   document.body.classList.remove('panorama-active')
 }
