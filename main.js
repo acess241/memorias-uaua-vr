@@ -115,9 +115,9 @@ function installSBS(scene){
   async function leaveFullscreen(){document.body.classList.remove('pseudo-fullscreen');const exit=document.exitFullscreen||document.webkitExitFullscreen;try{if(fullscreenElement()&&exit)await exit.call(document)}catch{};try{screen.orientation?.unlock?.()}catch{};$('#enter-fullscreen').textContent='TELA CHEIA'}
   function showExitControl(){
     if($('#exit-sbs-control'))return
-    const control=make('a-entity',{id:'exit-sbs-control',position:'0 .62 -2.15'}),target=make('a-plane',{class:'interactive gaze-target',width:'1.75',height:'.5',material:'shader:flat;color:#301C14;opacity:.96;depthTest:false'})
-    control.append(target);control.append(canvasLabel('SAIR DO VR',{width:1.55,height:.3,position:'0 0 .03',color:'#FFF1D2',fontSize:45,align:'center',weight:'700'}));$('#rig').append(control)
-    bindGaze(target,deactivate);target.addEventListener('click',deactivate)
+    const control=make('a-entity',{id:'exit-sbs-control',position:'0 4.65 -5.8'}),target=make('a-plane',{class:'interactive gaze-target',width:'1.15',height:'.34',material:'shader:flat;color:#301C14;opacity:.9'})
+    control.append(target);control.append(canvasLabel('SAIR DO VR',{width:1.02,height:.22,position:'0 0 .03',color:'#FFF1D2',fontSize:39,align:'center',weight:'700'}));scene.append(control)
+    bindGaze(target,deactivate)
   }
   async function activate(){unlockSessionMusic();enabled=true;setOverlay(false);document.body.classList.add('sbs-active');showExitControl();await Promise.allSettled([requestMotion(),enterFullscreen()])}
   async function deactivate(){if(!enabled)return;enabled=false;$('#exit-sbs-control')?.remove();document.body.classList.remove('sbs-active');setOverlay(true);await leaveFullscreen()}
@@ -159,7 +159,7 @@ function enterPanorama(panorama){
   if($('#visit-panorama'))return
   const scene=$('a-scene'),rig=$('#rig'),sky=make('a-sky',{id:'visit-panorama',src:assetPath(panorama),radius:'45',rotation:'0 -90 0',material:'shader:flat;side:back'})
   Array.from(scene.children).forEach(element=>{
-    if(element===rig||element.tagName==='A-ASSETS')return
+    if(element===rig||element.id==='exit-sbs-control'||element.tagName==='A-ASSETS')return
     element.dataset.visitVisibility=String(element.getAttribute('visible')!==false)
     element.setAttribute('visible','false')
   })
