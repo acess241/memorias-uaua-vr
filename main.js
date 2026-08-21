@@ -105,7 +105,7 @@ function installSBS(scene){
   renderer.render=function(scene3D,camera){
     if(!enabled||renderer.xr?.isPresenting)return originalRender(scene3D,camera)
     renderer.getSize(size);const leftWidth=Math.floor(size.x/2),rightWidth=size.x-leftWidth
-    camera.focus=7.15;camera.updateMatrixWorld();stereo.update(camera);renderer.setScissorTest(true)
+    camera.focus=7.65;camera.updateMatrixWorld();stereo.update(camera);renderer.setScissorTest(true)
     renderer.setScissor(0,0,leftWidth,size.y);renderer.setViewport(0,0,leftWidth,size.y);originalRender(scene3D,stereo.cameraL)
     renderer.setScissor(leftWidth,0,rightWidth,size.y);renderer.setViewport(leftWidth,0,rightWidth,size.y);originalRender(scene3D,stereo.cameraR)
     renderer.setScissorTest(false);renderer.setViewport(0,0,size.x,size.y)
@@ -115,8 +115,8 @@ function installSBS(scene){
   async function requestMotion(){if(typeof DeviceOrientationEvent!=='undefined'&&typeof DeviceOrientationEvent.requestPermission==='function')try{await DeviceOrientationEvent.requestPermission()}catch{}}
   async function enterFullscreen(){document.body.classList.add('pseudo-fullscreen');const request=document.documentElement.requestFullscreen||document.documentElement.webkitRequestFullscreen;try{if(request)await request.call(document.documentElement,{navigationUI:'hide'})}catch{};try{await screen.orientation?.lock?.('landscape')}catch{};const active=Boolean(fullscreenElement());$('#enter-fullscreen').textContent=active?'SAIR DA TELA CHEIA':'MODO AMPLO';return active}
   async function leaveFullscreen(){document.body.classList.remove('pseudo-fullscreen');const exit=document.exitFullscreen||document.webkitExitFullscreen;try{if(fullscreenElement()&&exit)await exit.call(document)}catch{};try{screen.orientation?.unlock?.()}catch{};$('#enter-fullscreen').textContent='TELA CHEIA'}
-  async function activate(){unlockSessionMusic();enabled=true;setOverlay(false);document.body.classList.add('sbs-active');$('#experience-exit').setAttribute('visible','true');await Promise.allSettled([requestMotion(),enterFullscreen()])}
-  async function deactivate(){if(!enabled)return;enabled=false;document.body.classList.remove('sbs-active');setOverlay(true);if(!$('#visit-panorama'))$('#experience-exit').setAttribute('visible','false');await leaveFullscreen()}
+  async function activate(){unlockSessionMusic();enabled=true;setOverlay(false);document.body.classList.add('sbs-active');$('#experience-exit').setAttribute('visible','false');await Promise.allSettled([requestMotion(),enterFullscreen()])}
+  async function deactivate(){if(!enabled)return;enabled=false;document.body.classList.remove('sbs-active');setOverlay(true);$('#experience-exit').setAttribute('visible','false');await leaveFullscreen()}
   leaveSBS=deactivate
   $('#enter-vr').addEventListener('click',()=>{unlockSessionMusic();enabled?deactivate():activate()})
   $('#enter-fullscreen').addEventListener('click',async()=>{unlockSessionMusic();if(fullscreenElement()||document.body.classList.contains('pseudo-fullscreen'))await leaveFullscreen();else await enterFullscreen()})
@@ -139,7 +139,7 @@ AFRAME.registerComponent('canvas-label',{
 function make(tag,attributes={}){const element=document.createElement(tag);Object.entries(attributes).forEach(([key,value])=>element.setAttribute(key,value));return element}
 function canvasLabel(text,{width=3.4,height=.5,position='0 0 .15',color='#073F73',fontSize=58,align='left',weight='600'}={}){const plane=make('a-plane',{width:String(width),height:String(height),position,material:'shader:flat;transparent:true;opacity:1;color:#fff'});plane.setAttribute('canvas-label',{text,color,fontSize,align,weight});return plane}
 
-function panelPosition(index,total){const angle=index*(360/total),radians=angle*Math.PI/180,radius=7.15;return{position:`${Math.sin(radians)*radius} 3.18 ${-Math.cos(radians)*radius}`,rotation:`0 ${-angle} 0`}}
+function panelPosition(index,total){const angle=index*(360/total),radians=angle*Math.PI/180,radius=7.65;return{position:`${Math.sin(radians)*radius} 3.18 ${-Math.cos(radians)*radius}`,rotation:`0 ${-angle} 0`}}
 function frame(){
   const panel=make('a-entity')
   panel.append(make('a-box',{width:'4.35',height:'5.25',depth:'.14',material:'shader:flat;color:#052F57'}))
