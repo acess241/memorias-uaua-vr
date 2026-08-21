@@ -98,16 +98,17 @@ function toggleSessionMusic(){
 }
 
 function installSBS(scene){
-  const renderer=scene.renderer,originalRender=renderer.render.bind(renderer),size=new THREE.Vector2()
+  const renderer=scene.renderer,originalRender=renderer.render.bind(renderer),size=new THREE.Vector2(),stereo=new THREE.StereoCamera()
+  stereo.eyeSep=.064
+  stereo.aspect=.5
   let enabled=false
   renderer.render=function(scene3D,camera){
     if(!enabled||renderer.xr?.isPresenting)return originalRender(scene3D,camera)
-    renderer.getSize(size);const half=Math.floor(size.x/2),previousAspect=camera.aspect;renderer.setScissorTest(true)
-    if(typeof camera.aspect==='number'){camera.aspect=half/size.y;camera.updateProjectionMatrix()}
-    renderer.setScissor(0,0,half,size.y);renderer.setViewport(0,0,half,size.y);originalRender(scene3D,camera)
-    renderer.setScissor(half,0,half,size.y);renderer.setViewport(half,0,half,size.y);originalRender(scene3D,camera)
+    renderer.getSize(size);const leftWidth=Math.floor(size.x/2),rightWidth=size.x-leftWidth
+    camera.focus=7.15;camera.updateMatrixWorld();stereo.update(camera);renderer.setScissorTest(true)
+    renderer.setScissor(0,0,leftWidth,size.y);renderer.setViewport(0,0,leftWidth,size.y);originalRender(scene3D,stereo.cameraL)
+    renderer.setScissor(leftWidth,0,rightWidth,size.y);renderer.setViewport(leftWidth,0,rightWidth,size.y);originalRender(scene3D,stereo.cameraR)
     renderer.setScissorTest(false);renderer.setViewport(0,0,size.x,size.y)
-    if(typeof previousAspect==='number'){camera.aspect=previousAspect;camera.updateProjectionMatrix()}
   }
   function setOverlay(visible){$('.hud').style.display=visible?'flex':'none';$('.orientation').style.display=visible?'flex':'none'}
   const fullscreenElement=()=>document.fullscreenElement||document.webkitFullscreenElement
