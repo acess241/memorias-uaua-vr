@@ -100,8 +100,7 @@ function toggleSessionMusic(){
 
 function installSBS(scene){
   const renderer=scene.renderer,originalRender=renderer.render.bind(renderer),stereo=new THREE.StereoCamera()
-  let savedIPD=64;try{const storedIPD=localStorage.getItem('museum-vr-ipd');if(storedIPD!==null)savedIPD=Number(storedIPD)}catch{}
-  savedIPD=Math.min(80,Math.max(0,savedIPD));stereo.eyeSep=savedIPD/1000
+  stereo.eyeSep=0
   stereo.aspect=.5
   let screenWidth=1,screenHeight=1,leftWidth=1,rightWidth=1,resizeFrame=0
   function readUsableViewport(){
@@ -143,11 +142,6 @@ function installSBS(scene){
   async function activate(){unlockSessionMusic();enabled=true;sbsActive=true;$('#camera').setAttribute('fov','90');updateVRSize();setOverlay(false);document.body.classList.add('sbs-active');$('#experience-exit').setAttribute('visible','false');await Promise.allSettled([requestMotion(),enterFullscreen()]);scheduleResize()}
   async function deactivate(){if(!enabled)return;enabled=false;sbsActive=false;$('#camera').setAttribute('fov','72');updateVRSize();document.body.classList.remove('sbs-active');setOverlay(true);$('#experience-exit').setAttribute('visible','false');await leaveFullscreen();scheduleResize()}
   leaveSBS=deactivate
-  const calibration=$('#vr-calibration'),ipdControl=$('#ipd-control'),ipdValue=$('#ipd-value')
-  ipdControl.value=String(savedIPD);ipdValue.value=`${savedIPD} mm`
-  $('#calibrate-vr').addEventListener('click',()=>calibration.classList.toggle('open'))
-  $('#close-calibration').addEventListener('click',()=>calibration.classList.remove('open'))
-  ipdControl.addEventListener('input',()=>{const millimeters=Number(ipdControl.value);stereo.eyeSep=millimeters/1000;ipdValue.value=`${millimeters} mm`;try{localStorage.setItem('museum-vr-ipd',String(millimeters))}catch{}})
   $('#enter-vr').addEventListener('click',()=>{unlockSessionMusic();enabled?deactivate():activate()})
   $('#enter-fullscreen').addEventListener('click',async()=>{unlockSessionMusic();if(fullscreenElement()||document.body.classList.contains('pseudo-fullscreen'))await leaveFullscreen();else await enterFullscreen()})
   ;['fullscreenchange','webkitfullscreenchange'].forEach(name=>document.addEventListener(name,()=>{$('#enter-fullscreen').textContent=fullscreenElement()||document.body.classList.contains('pseudo-fullscreen')?'SAIR DA TELA CHEIA':'TELA CHEIA';scheduleResize()}))
