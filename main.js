@@ -99,25 +99,40 @@ function toggleSessionMusic(){
 }
 
 function installSBS(scene){
-  const renderer=scene.renderer,originalRender=renderer.render.bind(renderer),size=new THREE.Vector2(),stereo=new THREE.StereoCamera()
-  stereo.eyeSep=.020
+  const renderer=scene.renderer,originalRender=renderer.render.bind(renderer),stereo=new THREE.StereoCamera()
+  stereo.eyeSep=.064
   stereo.aspect=.5
+  let screenWidth=1,screenHeight=1,leftWidth=1,rightWidth=1,resizeFrame=0
+  function updateVRSize(){
+    screenWidth=Math.max(1,window.innerWidth);screenHeight=Math.max(1,window.innerHeight)
+    leftWidth=Math.floor(screenWidth/2);rightWidth=screenWidth-leftWidth
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.5))
+    renderer.setSize(screenWidth,screenHeight,false)
+    renderer.domElement.style.width='100%';renderer.domElement.style.height='100%'
+    const camera=$('#camera')?.getObject3D('camera')
+    if(camera){camera.aspect=screenWidth/screenHeight;camera.fov=sbsActive?90:72;camera.updateProjectionMatrix()}
+  }
+  function scheduleResize(){cancelAnimationFrame(resizeFrame);resizeFrame=requestAnimationFrame(()=>{updateVRSize();setTimeout(updateVRSize,120)})}
+  window.addEventListener('resize',scheduleResize,{passive:true})
+  window.addEventListener('orientationchange',scheduleResize,{passive:true})
+  updateVRSize()
   let enabled=false
   renderer.render=function(scene3D,camera){
     if(!enabled||renderer.xr?.isPresenting)return originalRender(scene3D,camera)
-    renderer.getSize(size);const leftWidth=Math.floor(size.x/2),rightWidth=size.x-leftWidth
+    if(screenWidth!==window.innerWidth||screenHeight!==window.innerHeight)updateVRSize()
+    camera.aspect=screenWidth/screenHeight;camera.fov=90;camera.updateProjectionMatrix()
     camera.focus=7.2;camera.updateMatrixWorld(true);stereo.update(camera);renderer.setScissorTest(true)
-    renderer.setScissor(0,0,leftWidth,size.y);renderer.setViewport(0,0,leftWidth,size.y);originalRender(scene3D,stereo.cameraL)
-    renderer.setScissor(leftWidth,0,rightWidth,size.y);renderer.setViewport(leftWidth,0,rightWidth,size.y);originalRender(scene3D,stereo.cameraR)
-    renderer.setScissorTest(false);renderer.setViewport(0,0,size.x,size.y)
+    renderer.setScissor(0,0,leftWidth,screenHeight);renderer.setViewport(0,0,leftWidth,screenHeight);originalRender(scene3D,stereo.cameraL)
+    renderer.setScissor(leftWidth,0,rightWidth,screenHeight);renderer.setViewport(leftWidth,0,rightWidth,screenHeight);originalRender(scene3D,stereo.cameraR)
+    renderer.setScissorTest(false);renderer.setViewport(0,0,screenWidth,screenHeight)
   }
-  function setOverlay(visible){$('.hud').style.display='flex';$('.identity').style.display=visible?'flex':'none';$('.orientation').style.display=visible?'flex':'none';$('#enter-fullscreen').style.display=visible?'block':'none';$('#tourism-session').style.display=visible?'block':'none';$('#enter-vr').textContent=visible?'ATIVAR VR · SBS':'DESATIVAR VR · SBS'}
+  function setOverlay(visible){$('.hud').style.display='flex';$('.identity').style.display=visible?'flex':'none';$('.orientation').style.display=visible?'flex':'none';$('#enter-fullscreen').style.display=visible?'block':'none';$('#enter-vr').textContent=visible?'ATIVAR VR · SBS':'DESATIVAR VR · SBS'}
   const fullscreenElement=()=>document.fullscreenElement||document.webkitFullscreenElement
   async function requestMotion(){if(typeof DeviceOrientationEvent!=='undefined'&&typeof DeviceOrientationEvent.requestPermission==='function')try{await DeviceOrientationEvent.requestPermission()}catch{}}
   async function enterFullscreen(){document.body.classList.add('pseudo-fullscreen');const request=document.documentElement.requestFullscreen||document.documentElement.webkitRequestFullscreen;try{if(request)await request.call(document.documentElement,{navigationUI:'hide'})}catch{};try{await screen.orientation?.lock?.('landscape')}catch{};const active=Boolean(fullscreenElement());$('#enter-fullscreen').textContent=active?'SAIR DA TELA CHEIA':'MODO AMPLO';return active}
   async function leaveFullscreen(){document.body.classList.remove('pseudo-fullscreen');const exit=document.exitFullscreen||document.webkitExitFullscreen;try{if(fullscreenElement()&&exit)await exit.call(document)}catch{};try{screen.orientation?.unlock?.()}catch{};$('#enter-fullscreen').textContent='TELA CHEIA'}
-  async function activate(){unlockSessionMusic();enabled=true;sbsActive=true;$('#camera').setAttribute('fov','72');setOverlay(false);document.body.classList.add('sbs-active');$('#experience-exit').setAttribute('visible','false');await Promise.allSettled([requestMotion(),enterFullscreen()])}
-  async function deactivate(){if(!enabled)return;enabled=false;sbsActive=false;$('#camera').setAttribute('fov','72');document.body.classList.remove('sbs-active');setOverlay(true);$('#experience-exit').setAttribute('visible','false');await leaveFullscreen()}
+  async function activate(){unlockSessionMusic();enabled=true;sbsActive=true;$('#camera').setAttribute('fov','90');updateVRSize();setOverlay(false);document.body.classList.add('sbs-active');$('#experience-exit').setAttribute('visible','false');await Promise.allSettled([requestMotion(),enterFullscreen()]);scheduleResize()}
+  async function deactivate(){if(!enabled)return;enabled=false;sbsActive=false;$('#camera').setAttribute('fov','72');updateVRSize();document.body.classList.remove('sbs-active');setOverlay(true);$('#experience-exit').setAttribute('visible','false');await leaveFullscreen();scheduleResize()}
   leaveSBS=deactivate
   $('#enter-vr').addEventListener('click',()=>{unlockSessionMusic();enabled?deactivate():activate()})
   $('#enter-fullscreen').addEventListener('click',async()=>{unlockSessionMusic();if(fullscreenElement()||document.body.classList.contains('pseudo-fullscreen'))await leaveFullscreen();else await enterFullscreen()})
@@ -161,7 +176,7 @@ function enterPanorama(panorama){
     element.setAttribute('visible','false')
   })
   scene.append(sky)
-  $('#camera').setAttribute('fov',sbsActive?'72':'82')
+  $('#camera').setAttribute('fov',sbsActive?'90':'82')
   $('#experience-exit').setAttribute('visible','true')
   document.body.classList.add('panorama-active')
 }
@@ -210,7 +225,6 @@ function renderSession(){
 
 function nextSession(){currentSession=(currentSession+1)%sessions.length;renderSession()}
 function previousSession(){currentSession=(currentSession-1+sessions.length)%sessions.length;renderSession()}
-function openTourismSession(){if($('#visit-panorama'))exitPanorama();currentSession=sessions.findIndex(session=>session.title==='PAISAGENS E MEMÓRIAS');renderSession()}
 function bindGaze(target,action){let timer=null,cooldown=false;target.addEventListener('mouseenter',()=>{if(cooldown)return;target.setAttribute('animation__gaze','property:scale;from:1 1 1;to:1.18 1.18 1.18;dur:1600;easing:linear');timer=setTimeout(()=>{cooldown=true;action();target.setAttribute('animation__gaze','property:scale;to:1 1 1;dur:220');setTimeout(()=>cooldown=false,1200)},1600)});target.addEventListener('mouseleave',()=>{clearTimeout(timer);target.removeAttribute('animation__gaze');target.setAttribute('scale','1 1 1')})}
 
 function createColumns(){const columns=$('#columns');for(let i=0;i<12;i++){const angle=i*30,r=angle*Math.PI/180,e=make('a-entity',{position:`${Math.sin(r)*9.45} 0 ${Math.cos(r)*9.45}`});e.innerHTML='<a-cylinder radius=".18" height="5.65" position="0 2.85 0" material="color:#0B67C8;roughness:.88" segments-radial="12"></a-cylinder><a-cylinder radius=".34" height=".14" position="0 .07 0" material="color:#FDBA18"></a-cylinder>';columns.append(e)}}
@@ -221,4 +235,4 @@ function createExperienceExit(){
   control.append(target);control.append(canvasLabel('SAIR DA EXPERIÊNCIA',{width:2.12,height:.44,position:'0 0 .03',color:'#FFFFFF',fontSize:62,align:'center',weight:'700'}));$('a-scene').append(control);bindGaze(target,exitExperience)
 }
 
-window.addEventListener('DOMContentLoaded',()=>{createColumns();createCeilingLabels();createExperienceExit();renderSession();document.addEventListener('pointerdown',unlockSessionMusic,{once:true});$('#tourism-session').addEventListener('click',openTourismSession);bindGaze($('#previous-session-target'),previousSession);bindGaze($('#music-toggle-target'),toggleSessionMusic);bindGaze($('#next-session-target'),nextSession);const scene=$('a-scene');const initializeScene=()=>{if(scene.dataset.sbsReady||!scene.renderer)return;scene.dataset.sbsReady='true';scene.renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.5));installSBS(scene);setTimeout(()=>$('#loading').classList.add('hide'),450)};if(scene.hasLoaded)initializeScene();else scene.addEventListener('loaded',initializeScene,{once:true})})
+window.addEventListener('DOMContentLoaded',()=>{createColumns();createCeilingLabels();createExperienceExit();renderSession();document.addEventListener('pointerdown',unlockSessionMusic,{once:true});bindGaze($('#previous-session-target'),previousSession);bindGaze($('#music-toggle-target'),toggleSessionMusic);bindGaze($('#next-session-target'),nextSession);const scene=$('a-scene');const initializeScene=()=>{if(scene.dataset.sbsReady||!scene.renderer)return;scene.dataset.sbsReady='true';installSBS(scene);setTimeout(()=>$('#loading').classList.add('hide'),450)};if(scene.hasLoaded)initializeScene();else scene.addEventListener('loaded',initializeScene,{once:true})})
