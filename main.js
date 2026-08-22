@@ -100,7 +100,7 @@ function toggleSessionMusic(){
 
 function installSBS(scene){
   const renderer=scene.renderer,originalRender=renderer.render.bind(renderer),size=new THREE.Vector2(),stereo=new THREE.StereoCamera()
-  stereo.eyeSep=.016
+  stereo.eyeSep=.008
   stereo.aspect=.5
   let enabled=false
   renderer.render=function(scene3D,camera){
@@ -111,7 +111,7 @@ function installSBS(scene){
     renderer.setScissor(leftWidth,0,rightWidth,size.y);renderer.setViewport(leftWidth,0,rightWidth,size.y);originalRender(scene3D,stereo.cameraR)
     renderer.setScissorTest(false);renderer.setViewport(0,0,size.x,size.y)
   }
-  function setOverlay(visible){$('.hud').style.display='flex';$('.identity').style.display=visible?'flex':'none';$('.orientation').style.display=visible?'flex':'none';$('#enter-fullscreen').style.display=visible?'block':'none';$('#enter-vr').textContent=visible?'ATIVAR VR · SBS':'DESATIVAR VR · SBS'}
+  function setOverlay(visible){$('.hud').style.display='flex';$('.identity').style.display=visible?'flex':'none';$('.orientation').style.display=visible?'flex':'none';$('#enter-fullscreen').style.display=visible?'block':'none';$('#tourism-session').style.display=visible?'block':'none';$('#enter-vr').textContent=visible?'ATIVAR VR · SBS':'DESATIVAR VR · SBS'}
   const fullscreenElement=()=>document.fullscreenElement||document.webkitFullscreenElement
   async function requestMotion(){if(typeof DeviceOrientationEvent!=='undefined'&&typeof DeviceOrientationEvent.requestPermission==='function')try{await DeviceOrientationEvent.requestPermission()}catch{}}
   async function enterFullscreen(){document.body.classList.add('pseudo-fullscreen');const request=document.documentElement.requestFullscreen||document.documentElement.webkitRequestFullscreen;try{if(request)await request.call(document.documentElement,{navigationUI:'hide'})}catch{};try{await screen.orientation?.lock?.('landscape')}catch{};const active=Boolean(fullscreenElement());$('#enter-fullscreen').textContent=active?'SAIR DA TELA CHEIA':'MODO AMPLO';return active}
@@ -210,6 +210,7 @@ function renderSession(){
 
 function nextSession(){currentSession=(currentSession+1)%sessions.length;renderSession()}
 function previousSession(){currentSession=(currentSession-1+sessions.length)%sessions.length;renderSession()}
+function openTourismSession(){if($('#visit-panorama'))exitPanorama();currentSession=sessions.findIndex(session=>session.title==='PAISAGENS E MEMÓRIAS');renderSession()}
 function bindGaze(target,action){let timer=null,cooldown=false;target.addEventListener('mouseenter',()=>{if(cooldown)return;target.setAttribute('animation__gaze','property:scale;from:1 1 1;to:1.18 1.18 1.18;dur:1600;easing:linear');timer=setTimeout(()=>{cooldown=true;action();target.setAttribute('animation__gaze','property:scale;to:1 1 1;dur:220');setTimeout(()=>cooldown=false,1200)},1600)});target.addEventListener('mouseleave',()=>{clearTimeout(timer);target.removeAttribute('animation__gaze');target.setAttribute('scale','1 1 1')})}
 
 function createColumns(){const columns=$('#columns');for(let i=0;i<12;i++){const angle=i*30,r=angle*Math.PI/180,e=make('a-entity',{position:`${Math.sin(r)*9.45} 0 ${Math.cos(r)*9.45}`});e.innerHTML='<a-cylinder radius=".18" height="5.65" position="0 2.85 0" material="color:#0B67C8;roughness:.88" segments-radial="12"></a-cylinder><a-cylinder radius=".34" height=".14" position="0 .07 0" material="color:#FDBA18"></a-cylinder>';columns.append(e)}}
@@ -220,4 +221,4 @@ function createExperienceExit(){
   control.append(target);control.append(canvasLabel('SAIR DA EXPERIÊNCIA',{width:2.12,height:.44,position:'0 0 .03',color:'#FFFFFF',fontSize:62,align:'center',weight:'700'}));$('a-scene').append(control);bindGaze(target,exitExperience)
 }
 
-window.addEventListener('DOMContentLoaded',()=>{createColumns();createCeilingLabels();createExperienceExit();renderSession();document.addEventListener('pointerdown',unlockSessionMusic,{once:true});bindGaze($('#previous-session-target'),previousSession);bindGaze($('#music-toggle-target'),toggleSessionMusic);bindGaze($('#next-session-target'),nextSession);const scene=$('a-scene');const initializeScene=()=>{if(scene.dataset.sbsReady||!scene.renderer)return;scene.dataset.sbsReady='true';scene.renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.5));installSBS(scene);setTimeout(()=>$('#loading').classList.add('hide'),450)};if(scene.hasLoaded)initializeScene();else scene.addEventListener('loaded',initializeScene,{once:true})})
+window.addEventListener('DOMContentLoaded',()=>{createColumns();createCeilingLabels();createExperienceExit();renderSession();document.addEventListener('pointerdown',unlockSessionMusic,{once:true});$('#tourism-session').addEventListener('click',openTourismSession);bindGaze($('#previous-session-target'),previousSession);bindGaze($('#music-toggle-target'),toggleSessionMusic);bindGaze($('#next-session-target'),nextSession);const scene=$('a-scene');const initializeScene=()=>{if(scene.dataset.sbsReady||!scene.renderer)return;scene.dataset.sbsReady='true';scene.renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.5));installSBS(scene);setTimeout(()=>$('#loading').classList.add('hide'),450)};if(scene.hasLoaded)initializeScene();else scene.addEventListener('loaded',initializeScene,{once:true})})
