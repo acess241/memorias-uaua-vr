@@ -103,8 +103,14 @@ function installSBS(scene){
   stereo.eyeSep=.064
   stereo.aspect=.5
   let screenWidth=1,screenHeight=1,leftWidth=1,rightWidth=1,resizeFrame=0
+  function readUsableViewport(){
+    const viewport=window.visualViewport
+    const width=viewport?.width||document.documentElement.clientWidth||window.innerWidth
+    const height=viewport?.height||document.documentElement.clientHeight||window.innerHeight
+    return{width:Math.max(1,Math.round(width)),height:Math.max(1,Math.round(height))}
+  }
   function updateVRSize(){
-    screenWidth=Math.max(1,window.innerWidth);screenHeight=Math.max(1,window.innerHeight)
+    const viewport=readUsableViewport();screenWidth=viewport.width;screenHeight=viewport.height
     leftWidth=Math.floor(screenWidth/2);rightWidth=screenWidth-leftWidth
     renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.5))
     renderer.setSize(screenWidth,screenHeight,false)
@@ -115,11 +121,13 @@ function installSBS(scene){
   function scheduleResize(){cancelAnimationFrame(resizeFrame);resizeFrame=requestAnimationFrame(()=>{updateVRSize();setTimeout(updateVRSize,120)})}
   window.addEventListener('resize',scheduleResize,{passive:true})
   window.addEventListener('orientationchange',scheduleResize,{passive:true})
+  window.addEventListener('pageshow',scheduleResize,{passive:true})
+  window.visualViewport?.addEventListener('resize',scheduleResize,{passive:true})
   updateVRSize()
   let enabled=false
   renderer.render=function(scene3D,camera){
     if(!enabled||renderer.xr?.isPresenting)return originalRender(scene3D,camera)
-    if(screenWidth!==window.innerWidth||screenHeight!==window.innerHeight)updateVRSize()
+    const viewport=readUsableViewport();if(screenWidth!==viewport.width||screenHeight!==viewport.height)updateVRSize()
     camera.aspect=screenWidth/screenHeight;camera.fov=90;camera.updateProjectionMatrix()
     camera.focus=7.2;camera.updateMatrixWorld(true);stereo.update(camera);renderer.setScissorTest(true)
     renderer.setScissor(0,0,leftWidth,screenHeight);renderer.setViewport(0,0,leftWidth,screenHeight);originalRender(scene3D,stereo.cameraL)
@@ -136,7 +144,7 @@ function installSBS(scene){
   leaveSBS=deactivate
   $('#enter-vr').addEventListener('click',()=>{unlockSessionMusic();enabled?deactivate():activate()})
   $('#enter-fullscreen').addEventListener('click',async()=>{unlockSessionMusic();if(fullscreenElement()||document.body.classList.contains('pseudo-fullscreen'))await leaveFullscreen();else await enterFullscreen()})
-  ;['fullscreenchange','webkitfullscreenchange'].forEach(name=>document.addEventListener(name,()=>{$('#enter-fullscreen').textContent=fullscreenElement()||document.body.classList.contains('pseudo-fullscreen')?'SAIR DA TELA CHEIA':'TELA CHEIA'}))
+  ;['fullscreenchange','webkitfullscreenchange'].forEach(name=>document.addEventListener(name,()=>{$('#enter-fullscreen').textContent=fullscreenElement()||document.body.classList.contains('pseudo-fullscreen')?'SAIR DA TELA CHEIA':'TELA CHEIA';scheduleResize()}))
 }
 AFRAME.registerComponent('canvas-label',{
   schema:{text:{default:''},color:{default:'#073F73'},fontSize:{type:'int',default:58},align:{default:'left'},weight:{default:'600'}},
