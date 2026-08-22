@@ -99,9 +99,7 @@ function toggleSessionMusic(){
 }
 
 function installSBS(scene){
-  const renderer=scene.renderer,originalRender=renderer.render.bind(renderer),stereo=new THREE.StereoCamera()
-  stereo.eyeSep=0
-  stereo.aspect=.5
+  const renderer=scene.renderer,originalRender=renderer.render.bind(renderer)
   let screenWidth=1,screenHeight=1,leftWidth=1,rightWidth=1,resizeFrame=0
   function readUsableViewport(){
     const viewport=window.visualViewport
@@ -128,10 +126,9 @@ function installSBS(scene){
   renderer.render=function(scene3D,camera){
     if(!enabled||renderer.xr?.isPresenting)return originalRender(scene3D,camera)
     const viewport=readUsableViewport();if(screenWidth!==viewport.width||screenHeight!==viewport.height)updateVRSize()
-    camera.aspect=screenWidth/screenHeight;camera.fov=90;camera.updateProjectionMatrix()
-    camera.focus=7.2;camera.updateMatrixWorld(true);stereo.update(camera);renderer.setScissorTest(true)
-    renderer.setScissor(0,0,leftWidth,screenHeight);renderer.setViewport(0,0,leftWidth,screenHeight);originalRender(scene3D,stereo.cameraL)
-    renderer.setScissor(leftWidth,0,rightWidth,screenHeight);renderer.setViewport(leftWidth,0,rightWidth,screenHeight);originalRender(scene3D,stereo.cameraR)
+    camera.aspect=(screenWidth/2)/screenHeight;camera.fov=90;camera.updateProjectionMatrix();camera.updateMatrixWorld(true);renderer.setScissorTest(true)
+    renderer.setScissor(0,0,leftWidth,screenHeight);renderer.setViewport(0,0,leftWidth,screenHeight);originalRender(scene3D,camera)
+    renderer.setScissor(leftWidth,0,rightWidth,screenHeight);renderer.setViewport(leftWidth,0,rightWidth,screenHeight);originalRender(scene3D,camera)
     renderer.setScissorTest(false);renderer.setViewport(0,0,screenWidth,screenHeight)
   }
   function setOverlay(visible){$('.hud').style.display='flex';$('.identity').style.display=visible?'flex':'none';$('.orientation').style.display=visible?'flex':'none';$('#enter-fullscreen').style.display=visible?'block':'none';$('#enter-vr').textContent=visible?'ATIVAR VR · SBS':'DESATIVAR VR · SBS'}
