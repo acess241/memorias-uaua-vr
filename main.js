@@ -100,13 +100,13 @@ function toggleSessionMusic(){
 
 function installSBS(scene){
   const renderer=scene.renderer,originalRender=renderer.render.bind(renderer),size=new THREE.Vector2(),stereo=new THREE.StereoCamera()
-  stereo.eyeSep=.032
+  stereo.eyeSep=.016
   stereo.aspect=.5
   let enabled=false
   renderer.render=function(scene3D,camera){
     if(!enabled||renderer.xr?.isPresenting)return originalRender(scene3D,camera)
     renderer.getSize(size);const leftWidth=Math.floor(size.x/2),rightWidth=size.x-leftWidth
-    camera.focus=8.25;camera.updateMatrixWorld(true);stereo.update(camera);renderer.setScissorTest(true)
+    camera.focus=7.2;camera.updateMatrixWorld(true);stereo.update(camera);renderer.setScissorTest(true)
     renderer.setScissor(0,0,leftWidth,size.y);renderer.setViewport(0,0,leftWidth,size.y);originalRender(scene3D,stereo.cameraL)
     renderer.setScissor(leftWidth,0,rightWidth,size.y);renderer.setViewport(leftWidth,0,rightWidth,size.y);originalRender(scene3D,stereo.cameraR)
     renderer.setScissorTest(false);renderer.setViewport(0,0,size.x,size.y)
