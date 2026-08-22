@@ -1,3 +1,5 @@
+import './arms.js'
+
 const sessions = [
   {
     title:'MONUMENTOS',

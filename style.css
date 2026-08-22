@@ -17,6 +17,8 @@ a-scene{position:fixed!important;inset:0!important;width:100%!important;height:1
 .hud-actions{display:flex;gap:9px;pointer-events:auto}
 .hud button{pointer-events:auto;border:1px solid #fdbb1888;border-radius:30px;padding:11px 18px;background:#073f73df;color:#fff;font:700 9px 'Montserrat';letter-spacing:1.5px;cursor:pointer;backdrop-filter:blur(8px)}
 #enter-vr{background:#0b67c8e8;border-color:#fdba18}
+#camera-arms{background:#08796fe8;border-color:#75e6cf}
+#hand-camera{position:fixed;width:1px;height:1px;left:-10px;bottom:-10px;opacity:0;pointer-events:none}
 .orientation{position:fixed;z-index:5;bottom:max(25px,env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:12px;color:#fdba18;font-size:8px;letter-spacing:1.8px;pointer-events:none;text-shadow:0 2px 5px #002a50}
 .orientation i{display:block;width:28px;height:20px;border:1px solid #fdba18;border-radius:12px;position:relative}
 .orientation i:after{content:'';position:absolute;width:2px;height:6px;left:12px;top:3px;background:#fdba18;animation:look 1.8s ease-in-out infinite}
@@ -45,4 +47,5 @@ body.pseudo-fullscreen .hud{padding-top:max(10px,env(safe-area-inset-top))}
   .panorama-active .reconstruction-note{bottom:max(12px,env(safe-area-inset-bottom))}
   .sbs-active .hud-actions{display:block;left:auto;right:max(12px,env(safe-area-inset-right));width:min(250px,44vw)}
   .sbs-active #enter-vr{width:100%}
+  .sbs-active #camera-arms,.sbs-active #enter-fullscreen{display:none}
 }
