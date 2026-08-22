@@ -100,7 +100,7 @@ function toggleSessionMusic(){
 
 function installSBS(scene){
   const renderer=scene.renderer,originalRender=renderer.render.bind(renderer),size=new THREE.Vector2(),stereo=new THREE.StereoCamera()
-  stereo.eyeSep=.008
+  stereo.eyeSep=.020
   stereo.aspect=.5
   let enabled=false
   renderer.render=function(scene3D,camera){
