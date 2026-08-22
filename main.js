@@ -100,7 +100,7 @@ function toggleSessionMusic(){
 
 function installSBS(scene){
   const renderer=scene.renderer,originalRender=renderer.render.bind(renderer)
-  let screenWidth=1,screenHeight=1,leftWidth=1,rightWidth=1,resizeFrame=0
+  let viewportWidth=1,screenWidth=1,screenHeight=1,leftWidth=1,rightWidth=1,resizeFrame=0
   function readUsableViewport(){
     const viewport=window.visualViewport
     const width=viewport?.width||document.documentElement.clientWidth||window.innerWidth
@@ -108,11 +108,14 @@ function installSBS(scene){
     return{width:Math.max(1,Math.round(width)),height:Math.max(1,Math.round(height))}
   }
   function updateVRSize(){
-    const viewport=readUsableViewport();screenWidth=viewport.width;screenHeight=viewport.height
+    const viewport=readUsableViewport();viewportWidth=viewport.width;screenHeight=viewport.height
+    const sideMargin=sbsActive?Math.round(viewportWidth*.05):0
+    screenWidth=Math.max(2,viewportWidth-sideMargin*2)
     leftWidth=Math.floor(screenWidth/2);rightWidth=screenWidth-leftWidth
     renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.5))
     renderer.setSize(screenWidth,screenHeight,false)
-    renderer.domElement.style.width='100%';renderer.domElement.style.height='100%'
+    renderer.domElement.style.setProperty('width',`${screenWidth}px`,'important');renderer.domElement.style.setProperty('height',`${screenHeight}px`,'important')
+    renderer.domElement.style.setProperty('left',`${sideMargin}px`,'important');renderer.domElement.style.setProperty('right','auto','important')
     const camera=$('#camera')?.getObject3D('camera')
     if(camera){camera.aspect=screenWidth/screenHeight;camera.fov=sbsActive?90:72;camera.updateProjectionMatrix()}
   }
@@ -125,7 +128,7 @@ function installSBS(scene){
   let enabled=false
   renderer.render=function(scene3D,camera){
     if(!enabled||renderer.xr?.isPresenting)return originalRender(scene3D,camera)
-    const viewport=readUsableViewport();if(screenWidth!==viewport.width||screenHeight!==viewport.height)updateVRSize()
+    const viewport=readUsableViewport();if(viewportWidth!==viewport.width||screenHeight!==viewport.height)updateVRSize()
     camera.aspect=(screenWidth/2)/screenHeight;camera.fov=90;camera.updateProjectionMatrix();camera.updateMatrixWorld(true);renderer.setScissorTest(true)
     renderer.setScissor(0,0,leftWidth,screenHeight);renderer.setViewport(0,0,leftWidth,screenHeight);originalRender(scene3D,camera)
     renderer.setScissor(leftWidth,0,rightWidth,screenHeight);renderer.setViewport(leftWidth,0,rightWidth,screenHeight);originalRender(scene3D,camera)
