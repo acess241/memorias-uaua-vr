@@ -15,6 +15,13 @@ a-scene canvas{display:block!important;width:100%!important;height:100%!importan
 .hud-actions{display:flex;gap:9px;pointer-events:auto}
 .hud button{pointer-events:auto;border:1px solid #fdbb1888;border-radius:30px;padding:11px 18px;background:#073f73df;color:#fff;font:700 9px 'Montserrat';letter-spacing:1.5px;cursor:pointer;backdrop-filter:blur(8px)}
 #enter-vr{background:#0b67c8e8;border-color:#fdba18}
+#calibrate-vr{padding:8px 12px;font-size:7px;background:#052f57cc}
+#vr-calibration{display:none;position:fixed;z-index:20;left:50%;bottom:max(18px,env(safe-area-inset-bottom));transform:translateX(-50%);width:min(360px,calc(100vw - 28px));padding:16px;border:1px solid #fdba18;border-radius:14px;background:#052f57f5;color:#fff;box-shadow:0 12px 38px #00162dcc}
+#vr-calibration.open{display:grid;gap:10px}
+#vr-calibration b{font:800 15px 'Barlow Condensed',sans-serif;letter-spacing:1.5px;color:#fdba18}
+#vr-calibration label,#vr-calibration small{font-size:9px;line-height:1.4}
+#vr-calibration input{width:100%;accent-color:#fdba18}
+#vr-calibration button{justify-self:end;border:1px solid #fdba18;border-radius:18px;padding:8px 14px;background:#0b67c8;color:#fff;font:700 8px 'Montserrat'}
 .orientation{position:fixed;z-index:5;bottom:max(25px,env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:12px;color:#fdba18;font-size:8px;letter-spacing:1.8px;pointer-events:none;text-shadow:0 2px 5px #002a50}
 .orientation i{display:block;width:28px;height:20px;border:1px solid #fdba18;border-radius:12px;position:relative}
 .orientation i:after{content:'';position:absolute;width:2px;height:6px;left:12px;top:3px;background:#fdba18;animation:look 1.8s ease-in-out infinite}
@@ -44,4 +51,5 @@ body.pseudo-fullscreen .hud{padding-top:max(10px,env(safe-area-inset-top))}
   .sbs-active .hud-actions{display:block;left:auto;right:max(12px,env(safe-area-inset-right));width:min(250px,44vw)}
   .sbs-active #enter-vr{width:100%}
   .sbs-active #enter-fullscreen{display:none}
+  .sbs-active #calibrate-vr{display:block;width:100%;margin:6px 0}
 }

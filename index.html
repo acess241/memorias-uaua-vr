@@ -173,9 +173,18 @@
       <div class="identity"><img src="/branding/festival-cultura-2026.png" alt="Festival de Cultura CETEP 2026"><div><b>MUSEU PÁTRIA DOS VAGALUMES</b><small>MEMÓRIAS DE UAUÁ · EXPERIÊNCIA WEBXR</small></div></div>
       <div class="hud-actions">
         <button id="enter-fullscreen" type="button" aria-label="Ativar tela cheia">TELA CHEIA</button>
+        <button id="calibrate-vr" type="button" aria-label="Calibrar distância entre os olhos">CALIBRAR VR</button>
         <button id="enter-vr" type="button" aria-label="Ativar realidade virtual lado a lado">ATIVAR VR · SBS</button>
       </div>
     </header>
+
+    <aside id="vr-calibration" aria-label="Calibração do modo VR">
+      <b>CALIBRAÇÃO DOS OLHOS</b>
+      <label for="ipd-control">DISTÂNCIA: <output id="ipd-value">64 mm</output></label>
+      <input id="ipd-control" type="range" min="0" max="80" value="64" step="1">
+      <small>Com o VR ativo, ajuste até as duas imagens formarem uma só.</small>
+      <button id="close-calibration" type="button">CONCLUIR</button>
+    </aside>
 
     <aside class="orientation"><i></i><span>OLHE AO REDOR · O PAINEL DE NAVEGAÇÃO ESTÁ ATRÁS DE VOCÊ</span></aside>
     <aside class="reconstruction-note">RECONSTRUÇÃO VISUAL DIGITAL · Imagens interpretativas reconstruídas e colorizadas digitalmente. As cenas não são reproduções 100% exatas dos locais históricos.</aside>
