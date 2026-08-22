@@ -99,17 +99,17 @@ function toggleSessionMusic(){
 }
 
 function installSBS(scene){
-  const renderer=scene.renderer,originalRender=renderer.render.bind(renderer),size=new THREE.Vector2(),stereo=new THREE.StereoCamera()
-  stereo.eyeSep=0
-  stereo.aspect=.5
+  const renderer=scene.renderer,originalRender=renderer.render.bind(renderer),size=new THREE.Vector2()
   let enabled=false
   renderer.render=function(scene3D,camera){
     if(!enabled||renderer.xr?.isPresenting)return originalRender(scene3D,camera)
     renderer.getSize(size);const leftWidth=Math.floor(size.x/2),rightWidth=size.x-leftWidth
-    camera.focus=8.25;camera.updateMatrixWorld();stereo.update(camera);renderer.setScissorTest(true)
-    renderer.setScissor(0,0,leftWidth,size.y);renderer.setViewport(0,0,leftWidth,size.y);originalRender(scene3D,stereo.cameraL)
-    renderer.setScissor(leftWidth,0,rightWidth,size.y);renderer.setViewport(leftWidth,0,rightWidth,size.y);originalRender(scene3D,stereo.cameraR)
-    renderer.setScissorTest(false);renderer.setViewport(0,0,size.x,size.y)
+    const originalAspect=camera.aspect
+    camera.aspect=leftWidth/size.y;camera.updateProjectionMatrix();camera.updateMatrixWorld();renderer.setScissorTest(true)
+    renderer.setScissor(0,0,leftWidth,size.y);renderer.setViewport(0,0,leftWidth,size.y);originalRender(scene3D,camera)
+    camera.aspect=rightWidth/size.y;camera.updateProjectionMatrix()
+    renderer.setScissor(leftWidth,0,rightWidth,size.y);renderer.setViewport(leftWidth,0,rightWidth,size.y);originalRender(scene3D,camera)
+    renderer.setScissorTest(false);renderer.setViewport(0,0,size.x,size.y);camera.aspect=originalAspect;camera.updateProjectionMatrix()
   }
   function setOverlay(visible){$('.hud').style.display='flex';$('.identity').style.display=visible?'flex':'none';$('.orientation').style.display=visible?'flex':'none';$('#enter-fullscreen').style.display=visible?'block':'none';$('#enter-vr').textContent=visible?'ATIVAR VR · SBS':'DESATIVAR VR · SBS'}
   const fullscreenElement=()=>document.fullscreenElement||document.webkitFullscreenElement
