@@ -75,7 +75,7 @@ const assetPath=path=>`${import.meta.env.BASE_URL}${path.replace(/^\/+/, '')}`
 const sessionAudio=new Audio()
 const monumentGuides={
   '/panoramas/belo-monte.png':{name:'ANTÔNIO LOIOLA',role:'PERSONAGEM DA MEMÓRIA CULTURAL DE UAUÁ',image:'/guias/antonio-loiola.png'},
-  '/panoramas/correios.png':{name:'SENHOR ADEMAR',role:'ANFITRIÃO DE UM PONTO DE ENCONTRO CULTURAL',image:'/guias/senhor-ademar.png'},
+  '/panoramas/correios.png':{name:'SENHOR ADEMAR',role:'PROPRIETÁRIO DO BAR DO ADEMAR, PONTO DE ENCONTRO DE ARTISTAS DE UAUÁ',image:'/guias/senhor-ademar.png'},
   '/panoramas/casa-roque.png':{name:'AUTO BARBOSA',role:'MÚSICO E AGITADOR CULTURAL UAUÁENSE',image:'/guias/auto-barbosa.png'},
   '/panoramas/escola-joao-borges.png':{name:'MIKAL LÔBO',role:'POETISA E ESCRITORA DE UAUÁ',image:'/guias/mikal-lobo.png'},
   '/panoramas/escola-senhor-bonfim.png':{name:'ZÉ DE AUTO',role:'MÚSICO, COMPOSITOR E MESTRE DO PÉ-DE-BODE',image:'/guias/ze-de-auto.png'},
@@ -259,7 +259,8 @@ function createPhotoPanel(item,index,total,sessionTitle){
   panel.append(canvasLabel(item.title,{width:3.6,height:.84,position:'0 1.57 .15',color:'#073F73',fontSize:82,weight:'700'}))
   const group=make('a-entity',{position:'0 .5 .16'}),count=item.photos.length,layouts=count===3?[[-1.25,1.12,1.55],[0,1.12,1.55],[1.25,1.12,1.55]]:count===2?[[-.96,1.72,1.55],[.96,1.72,1.55]]:[[0,3.35,1.6]]
   item.photos.forEach((src,i)=>{const[x,width,height]=layouts[i];group.append(fitPhoto(src,x,width,height))});panel.append(group)
-  panel.append(canvasLabel(item.caption,{width:3.6,height:1.48,position:'0 -1.15 .15',color:'#0B3152',fontSize:62,weight:'700'}))
+  const captionSize=item.caption.length>145?44:item.caption.length>110?48:item.caption.length>80?52:56
+  panel.append(canvasLabel(item.caption,{width:3.6,height:1.36,position:'0 -1.08 .15',color:'#0B3152',fontSize:captionSize,weight:'700'}))
   if(item.panorama)addVisitButton(panel,item.panorama);return panel
 }
 
