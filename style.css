@@ -29,15 +29,13 @@ a-scene canvas{display:block!important;width:100%!important;height:100%!importan
 #loading p{margin-top:28px;font-size:9px;font-weight:700;letter-spacing:4px;color:#fdba18}
 body.pseudo-fullscreen{position:fixed;inset:0;width:100vw;height:100dvh;overscroll-behavior:none}
 body.pseudo-fullscreen .hud{padding-top:max(10px,env(safe-area-inset-top))}
-#cinematic-intro,#museum-finale{position:fixed;z-index:40;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:28px;background:radial-gradient(circle at 50% 65%,#092a32 0,#02070b 58%,#000 100%);overflow:hidden;transition:opacity 1.2s,visibility 1.2s}
-#cinematic-intro.started,#museum-finale:not(.show){opacity:0;visibility:hidden;pointer-events:none}
-#cinematic-intro h1,#museum-finale h2{margin:10px 0;color:#f7fbff;font:800 clamp(34px,7vw,90px) 'Barlow Condensed',sans-serif;letter-spacing:.08em;text-transform:uppercase;text-shadow:0 0 25px #fdbb1877}
-.intro-kicker{color:#fdbb18;font-size:clamp(9px,1.4vw,16px);letter-spacing:.42em}
-.intro-instruction{margin-top:34px;color:#d8ebf8;font-size:clamp(10px,1.3vw,15px);letter-spacing:.28em;animation:introPulse 1.7s ease-in-out infinite}
+#museum-finale{position:fixed;z-index:40;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:28px;background:radial-gradient(circle at 50% 65%,#092a32 0,#02070b 58%,#000 100%);overflow:hidden;transition:opacity 1.2s,visibility 1.2s}
+#museum-finale:not(.show){opacity:0;visibility:hidden;pointer-events:none}
+#museum-finale h2{margin:10px 0;color:#f7fbff;font:800 clamp(34px,7vw,90px) 'Barlow Condensed',sans-serif;letter-spacing:.08em;text-transform:uppercase;text-shadow:0 0 25px #fdbb1877}
 #museum-finale blockquote{max-width:850px;margin:0;color:#fff;font-size:clamp(20px,3.2vw,42px);line-height:1.45;font-weight:500}
 #museum-finale button{margin-top:30px;border:2px solid #fdbb18;border-radius:999px;padding:16px 28px;background:#0867c7;color:#fff;font-weight:800;letter-spacing:.15em;cursor:pointer}
-.intro-fireflies,.finale-fireflies{position:absolute;inset:0;pointer-events:none;background-image:radial-gradient(circle,#ffe978 0 2px,transparent 3px),radial-gradient(circle,#fdbb18 0 1px,transparent 3px),radial-gradient(circle,#fff6a4 0 2px,transparent 4px);background-size:127px 113px,181px 157px,239px 199px;animation:fireflyDrift 8s linear infinite;filter:drop-shadow(0 0 7px #ffe553)}
-@keyframes introPulse{50%{opacity:.38}}@keyframes fireflyDrift{50%{transform:translate(18px,-25px);opacity:.55}}
+.finale-fireflies{position:absolute;inset:0;pointer-events:none;background-image:radial-gradient(circle,#ffe978 0 2px,transparent 3px),radial-gradient(circle,#fdbb18 0 1px,transparent 3px),radial-gradient(circle,#fff6a4 0 2px,transparent 4px);background-size:127px 113px,181px 157px,239px 199px;animation:fireflyDrift 8s linear infinite;filter:drop-shadow(0 0 7px #ffe553)}
+@keyframes fireflyDrift{50%{transform:translate(18px,-25px);opacity:.55}}
 
 @media(max-width:768px){
   .hud{padding:12px}
