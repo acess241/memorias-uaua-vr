@@ -301,7 +301,7 @@ function createMemoryFireflies(){const scene=$('a-scene');for(let i=0;i<16;i++){
 
 function createCeilingLabels(){const controls=$('#ceiling-controls');controls.append(canvasLabel('SESSÃO\nANTERIOR',{width:1.48,height:.88,position:'-1.55 .12 .16',color:'#FFFFFF',fontSize:92,align:'center',weight:'700'}));const musicLabel=canvasLabel('PAUSAR\nMÚSICA',{width:1.48,height:.88,position:'0 .12 .16',color:'#FFFFFF',fontSize:92,align:'center',weight:'700'});musicLabel.id='music-control-label';controls.append(musicLabel);controls.append(canvasLabel('PRÓXIMA\nSESSÃO',{width:1.48,height:.88,position:'1.55 .12 .16',color:'#FFFFFF',fontSize:92,align:'center',weight:'700'}));controls.append(canvasLabel('FIXE O OLHAR PARA NAVEGAR',{width:4.15,height:.5,position:'0 -.97 .14',color:'#073F73',fontSize:76,align:'center',weight:'700'}))}
 function createExperienceExit(){
-  const control=make('a-entity',{id:'experience-exit',position:'0 2.7 -7.2',rotation:'0 0 0',visible:'false'}),target=make('a-plane',{class:'interactive gaze-target',width:'3.25',height:'.82',material:'shader:flat;color:#073F73;opacity:.98;depthTest:false'})
+  const control=make('a-entity',{id:'experience-exit',position:'4.8 2.45 -3.4',rotation:'0 -55 0',visible:'false'}),target=make('a-plane',{class:'interactive gaze-target',width:'3.25',height:'.82',material:'shader:flat;color:#073F73;opacity:.98;depthTest:false'})
   control.append(target);control.append(canvasLabel('SAIR DA EXPERIÊNCIA',{width:'2.95',height:'.58',position:'0 0 .03',color:'#FFFFFF',fontSize:82,align:'center',weight:'700'}));$('a-scene').append(control);bindGaze(target,exitExperience)
 }
 
