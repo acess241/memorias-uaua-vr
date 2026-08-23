@@ -77,8 +77,10 @@ const monumentGuides={
   '/panoramas/correios.png':{name:'SENHOR ADEMAR',role:'ANFITRIÃO DE UM PONTO DE ENCONTRO CULTURAL',image:'/guias/senhor-ademar.png'},
   '/panoramas/casa-roque.png':{name:'AUTO BARBOSA',role:'MÚSICO E AGITADOR CULTURAL UAUÁENSE',image:'/guias/auto-barbosa.png'},
   '/panoramas/escola-joao-borges.png':{name:'MIKAL LÔBO',role:'POETISA E ESCRITORA DE UAUÁ',image:'/guias/mikal-lobo.png'},
+  '/panoramas/escola-senhor-bonfim.png':{name:'ZÉ DE AUTO',role:'MÚSICO, COMPOSITOR E MESTRE DO PÉ-DE-BODE',image:'/guias/ze-de-auto.png'},
   '/panoramas/igreja-sao-joao.png':{name:'MESTRE CAVACHÃO',role:'CANTOR, COMPOSITOR E MEMORIALISTA',image:'/guias/mestre-cavachao.png'},
   '/panoramas/praca-igreja.png':{name:'DEDÉ DO FOTO',role:'PERSONAGEM DA CULTURA SERTANEJA',image:'/guias/dede-do-foto.png'},
+  '/panoramas/escola-datilografia.png':{name:'MARIANE CARDOSO',role:'POETA DE UAUÁ',image:'/guias/mariane-cardoso.png'},
   '/panoramas/prefeitura.png':{name:'VEINHO',role:'MÚSICA, HUMOR E MEMÓRIA ORAL DE UAUÁ',image:'/guias/veinho.png'}
 }
 let audioUnlocked=false
