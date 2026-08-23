@@ -258,6 +258,12 @@ function enterPanorama(panorama){
   scene.append(sky)
   const guide=monumentGuides[panorama]
   if(guide){const host=make('a-entity',{id:'visit-guide',position:'-4.8 -.86 -3.4',rotation:'0 55 0'});host.append(make('a-circle',{radius:'1.02',position:'0 .025 .08',rotation:'-90 0 0',scale:'1 .34 1',material:'shader:flat;color:#06182A;transparent:true;opacity:.34;side:double'}));const character=make('a-plane',{width:'2.1',height:'4.2','segments-width':'20','segments-height':'40',position:'0 2.1 0',material:'shader:flat;transparent:true;alphaTest:.025;side:double'});character.setAttribute('waving-guide',{src:assetPath(guide.image)});host.append(character);host.append(make('a-plane',{width:'3.65',height:'1.28',position:'-2.85 2.44 .01',material:'shader:flat;color:#073F73;opacity:.98'}));host.append(canvasLabel(guide.name,{width:3.36,height:.46,position:'-2.85 2.71 .03',color:'#FFFFFF',fontSize:82,align:'center',weight:'700'}));host.append(canvasLabel(guide.role,{width:3.3,height:.62,position:'-2.85 2.21 .03',color:'#FDBA18',fontSize:59,align:'center',weight:'700'}));const repeat=make('a-plane',{class:'interactive gaze-target',width:'2.7',height:'.62',position:'-2.85 1.48 .02',material:'shader:flat;color:#0867C7;opacity:.98'});host.append(repeat);host.append(canvasLabel('OUVIR NOVAMENTE',{width:2.45,height:.42,position:'-2.85 1.48 .04',color:'#FFFFFF',fontSize:65,align:'center',weight:'700'}));scene.append(host);guideNarration=new Audio(assetPath(guide.audio));guideNarration.preload='auto';guideNarration.addEventListener('ended',()=>{sessionAudio.volume=.55});bindGaze(repeat,()=>playGuideNarration(true));narrationStartTimer=setTimeout(()=>playGuideNarration(true),900)}
+  const restoredGuide=$('#visit-guide')
+  if(restoredGuide){
+    restoredGuide.setAttribute('visible','true')
+    restoredGuide.setAttribute('position','-3.65 -.86 -3.75')
+    restoredGuide.setAttribute('rotation','0 44 0')
+  }
   $('#camera').setAttribute('fov',sbsActive?'90':'82')
   $('#experience-exit').setAttribute('visible','true')
   document.body.classList.add('panorama-active')
