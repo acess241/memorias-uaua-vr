@@ -207,13 +207,15 @@ AFRAME.registerComponent('waving-guide',{
       this.body=work
       this.ctx.clearRect(0,0,this.canvas.width,this.canvas.height);this.ctx.drawImage(this.body,0,0)
       this.texture=new THREE.CanvasTexture(this.canvas);this.texture.colorSpace=THREE.SRGBColorSpace
-      const apply=()=>{const mesh=this.el.getObject3D('mesh');if(!mesh)return;mesh.material.map=this.texture;mesh.material.color.set('#fff');mesh.material.transparent=true;mesh.material.alphaTest=.025;mesh.material.side=THREE.DoubleSide;mesh.material.needsUpdate=true;const position=mesh.geometry?.attributes?.position;if(position&&position.count>20){this.mesh=mesh;this.basePositions=new Float32Array(position.array)}}
-      apply();this.el.addEventListener('object3dset',apply,{once:true});this.ready=true;this.texture.needsUpdate=true
+      const apply=()=>{const mesh=this.el.getObject3D('mesh');if(!mesh||!mesh.material)return;mesh.material.map=this.texture;mesh.material.color.set('#fff');mesh.material.transparent=true;mesh.material.alphaTest=.025;mesh.material.side=THREE.DoubleSide;mesh.material.needsUpdate=true;const position=mesh.geometry?.attributes?.position;if(position&&position.count>20&&this.mesh!==mesh){this.mesh=mesh;this.basePositions=new Float32Array(position.array)}}
+      this.applyTexture=apply;apply();this.el.addEventListener('object3dset',apply);this.ready=true;this.texture.needsUpdate=true
     }
     this.image.src=this.data.src
   },
   tick(time){
-    if(!this.ready||!this.mesh||!this.basePositions)return
+    if(!this.ready)return
+    if(!this.mesh||this.mesh.material?.map!==this.texture)this.applyTexture?.()
+    if(!this.mesh||!this.basePositions)return
     const position=this.mesh.geometry.attributes.position,phase=Math.sin(time*.0035)
     for(let i=0;i<position.count;i++){
       const offset=i*3,x=this.basePositions[offset],y=this.basePositions[offset+1]
@@ -223,7 +225,7 @@ AFRAME.registerComponent('waving-guide',{
     }
     position.needsUpdate=true
   },
-  remove(){this.texture?.dispose()}
+  remove(){this.texture?.dispose();if(this.applyTexture)this.el.removeEventListener('object3dset',this.applyTexture)}
 })
 
 function make(tag,attributes={}){const element=document.createElement(tag);Object.entries(attributes).forEach(([key,value])=>element.setAttribute(key,value));return element}
