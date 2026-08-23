@@ -185,8 +185,6 @@ AFRAME.registerComponent('waving-guide',{
       }
       context.putImageData(pixels,0,0)
       this.body=work
-      this.arm=document.createElement('canvas');this.arm.width=310;this.arm.height=650
-      this.arm.getContext('2d').drawImage(work,0,0,310,650,0,0,310,650)
       this.texture=new THREE.CanvasTexture(this.canvas);this.texture.colorSpace=THREE.SRGBColorSpace
       const apply=()=>{const mesh=this.el.getObject3D('mesh');if(!mesh)return;mesh.material.map=this.texture;mesh.material.color.set('#fff');mesh.material.transparent=true;mesh.material.alphaTest=.025;mesh.material.side=THREE.DoubleSide;mesh.material.needsUpdate=true}
       apply();this.el.addEventListener('object3dset',apply,{once:true});this.ready=true
@@ -195,10 +193,19 @@ AFRAME.registerComponent('waving-guide',{
   },
   tick(time){
     if(!this.ready)return
-    const context=this.ctx,w=this.canvas.width,h=this.canvas.height
-    context.clearRect(0,0,w,h);context.drawImage(this.body,0,0)
-    const pivotX=238,pivotY=350,angle=Math.sin(time*.0045)*.18
-    context.save();context.translate(pivotX,pivotY);context.rotate(angle);context.translate(-pivotX,-pivotY);context.drawImage(this.arm,0,0);context.restore()
+    const context=this.ctx,w=this.canvas.width,h=this.canvas.height,cell=24,wave=Math.sin(time*.0045)
+    context.clearRect(0,0,w,h)
+    for(let y=0;y<h;y+=cell){
+      for(let x=0;x<w;x+=cell){
+        let dx=0,dy=0
+        if(x<w*.43&&y<h*.43){
+          const vertical=Math.max(0,1-y/(h*.43)),horizontal=Math.max(0,1-x/(w*.43)),influence=vertical*horizontal
+          dx=wave*34*influence;dy=Math.abs(wave)*8*influence
+        }
+        const cw=Math.min(cell,w-x),ch=Math.min(cell,h-y)
+        context.drawImage(this.body,x,y,cw,ch,x+dx,y+dy,cw+1,ch+1)
+      }
+    }
     this.texture.needsUpdate=true
   },
   remove(){this.texture?.dispose()}
