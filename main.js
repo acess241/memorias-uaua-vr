@@ -72,6 +72,15 @@ let sbsActive=false
 const $=selector=>document.querySelector(selector)
 const assetPath=path=>`${import.meta.env.BASE_URL}${path.replace(/^\/+/, '')}`
 const sessionAudio=new Audio()
+const monumentGuides={
+  '/panoramas/belo-monte.png':{name:'ANTÔNIO LOIOLA',image:'/guias/antonio-loiola.png'},
+  '/panoramas/correios.png':{name:'SENHOR ADEMAR',image:'/guias/senhor-ademar.png'},
+  '/panoramas/casa-roque.png':{name:'AUTO BARBOSA',image:'/guias/auto-barbosa.png'},
+  '/panoramas/escola-joao-borges.png':{name:'MIKAL LÔBO',image:'/guias/mikal-lobo.png'},
+  '/panoramas/igreja-sao-joao.png':{name:'MESTRE CAVACHÃO',image:'/guias/mestre-cavachao.png'},
+  '/panoramas/praca-igreja.png':{name:'DEDÉ DO FOTO',image:'/guias/dede-do-foto.png'},
+  '/panoramas/prefeitura.png':{name:'VEINHO',image:'/guias/veinho.png'}
+}
 let audioUnlocked=false
 let musicPaused=false
 sessionAudio.preload='auto'
@@ -187,6 +196,8 @@ function enterPanorama(panorama){
     element.setAttribute('visible','false')
   })
   scene.append(sky)
+  const guide=monumentGuides[panorama]
+  if(guide){const host=make('a-entity',{id:'visit-guide',position:'-2.35 0 -5.4',animation:'property:rotation;from:0 -2 -1;to:0 2 1;dir:alternate;loop:true;dur:1100;easing:easeInOutSine'});host.append(make('a-image',{src:assetPath(guide.image),width:'1.72',height:'3.45',position:'0 1.72 0',material:'shader:flat;transparent:true;alphaTest:.03;side:double'}));host.append(make('a-plane',{width:'2.15',height:'.62',position:'0 -.14 .01',material:'shader:flat;color:#073F73;opacity:.94'}));host.append(canvasLabel(`GUIA DA MEMÓRIA\n${guide.name}`,{width:1.95,height:.48,position:'0 -.14 .03',color:'#FFFFFF',fontSize:48,align:'center',weight:'700'}));scene.append(host)}
   $('#camera').setAttribute('fov',sbsActive?'90':'82')
   $('#experience-exit').setAttribute('visible','true')
   document.body.classList.add('panorama-active')
@@ -194,6 +205,7 @@ function enterPanorama(panorama){
 function exitPanorama(){
   window.gazeLockedUntil=Date.now()+2600
   $('#visit-panorama')?.remove()
+  $('#visit-guide')?.remove()
   const scene=$('a-scene'),rig=$('#rig')
   Array.from(scene.children).forEach(element=>{
     if(element===rig||element.tagName==='A-ASSETS'||element.id==='visit-panorama')return
