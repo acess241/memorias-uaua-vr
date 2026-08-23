@@ -187,9 +187,29 @@ function hideMuseumForExperience(root){
 function enterAlvorada(){
   if($('#alvorada-experience'))return
   sessionAudio.pause();const scene=$('a-scene'),root=make('a-entity',{id:'alvorada-experience'});hideMuseumForExperience(root)
-  root.append(make('a-sky',{src:assetPath('/alvorada/panorama-alvorada.png'),radius:'48',rotation:'0 -90 0',material:'shader:flat;side:back',animation:'property:rotation;from:0 -90 0;to:0 -86 0;dur:90000;easing:linear'}));scene.append(root)
-  const rig=$('#rig');rig.setAttribute('position','0 1.65 0');rig.setAttribute('animation__alvorada','property:position;from:0 1.62 0;to:0 1.69 0;dur:720;dir:alternate;loop:true;easing:easeInOutSine')
-  const audio=document.createElement('video');audio.id='alvorada-audio';audio.src=assetPath('/alvorada/registro-01.mp4');audio.playsInline=true;audio.loop=true;audio.style.display='none';document.body.append(audio);audio.play().catch(()=>{})
+  root.append(make('a-sky',{src:assetPath('/alvorada/panorama-alvorada.png'),radius:'48',rotation:'0 -90 0',material:'shader:flat;side:back'}))
+
+  // Registros reais: a festa deixa de ser um fundo parado e passa a acontecer
+  // ao redor do visitante. O vídeo principal também fornece o som ambiente.
+  const records=['registro-01.mp4','registro-02.mp4','registro-03.mp4'].map((name,index)=>{
+    const video=document.createElement('video');video.id=`alvorada-record-${index+1}`;video.src=assetPath(`/alvorada/${name}`);video.playsInline=true;video.setAttribute('playsinline','');video.setAttribute('webkit-playsinline','');video.loop=true;video.preload='auto';video.crossOrigin='anonymous';video.volume=index===0?1:0;video.muted=index!==0;document.body.append(video);return video
+  })
+  const liveScenes=[
+    {src:'#alvorada-record-1',position:'0 2.35 -7.8',rotation:'0 0 0',width:'7.2',height:'4.05'},
+    {src:'#alvorada-record-2',position:'-7 2.3 -2.2',rotation:'0 66 0',width:'5.5',height:'3.15'},
+    {src:'#alvorada-record-3',position:'7 2.3 -2.2',rotation:'0 -66 0',width:'5.5',height:'3.15'}
+  ]
+  liveScenes.forEach((item,index)=>{
+    const frame=make('a-plane',{position:item.position,rotation:item.rotation,width:item.width,height:item.height,material:`shader:flat;src:${item.src};side:double`,animation:`property:position;dir:alternate;loop:true;dur:${4200+index*700};easing:easeInOutSine;to:${item.position.split(' ').map((v,i)=>i===1?Number(v)+.08:v).join(' ')}`})
+    root.append(frame)
+  })
+  // Cordões de bandeirolas em primeiro plano dão profundidade durante a caminhada.
+  ;[-5.4,-1.8,1.8,5.4].forEach((x,index)=>{
+    const flag=make('a-triangle',{vertexA:'-.22 .18 0',vertexB:'.22 .18 0',vertexC:'0 -.28 0',position:`${x} 4.15 -5.2`,material:`shader:flat;color:${index%2?'#FDBA18':'#0867C7'};side:double`,animation:`property:rotation;from:0 -8 -4;to:0 8 4;dir:alternate;loop:true;dur:${700+index*90};easing:easeInOutSine`});root.append(flag)
+  })
+  scene.append(root)
+  const rig=$('#rig');rig.setAttribute('position','0 1.65 1.15');rig.setAttribute('animation__alvorada','property:position;from:0 1.62 1.15;to:0 1.70 -.35;dur:9000;dir:alternate;loop:true;easing:easeInOutSine')
+  records.forEach(video=>video.play().catch(()=>{}))
   $('#experience-exit').setAttribute('visible','true');document.body.classList.add('panorama-active')
 }
 function enterPanorama(panorama){
@@ -217,7 +237,7 @@ function exitPanorama(){
   document.body.classList.remove('panorama-active')
 }
 function exitAlvorada(){
-  $('#alvorada-audio')?.pause();$('#alvorada-audio')?.remove();$('#alvorada-experience')?.remove();const rig=$('#rig');rig.removeAttribute('animation__alvorada');rig.setAttribute('position','0 1.65 0');Array.from($('a-scene').children).forEach(element=>{if(element.dataset.visitVisibility!==undefined){element.setAttribute('visible',element.dataset.visitVisibility==='true');delete element.dataset.visitVisibility}});$('#camera').setAttribute('fov','72');$('#experience-exit').setAttribute('visible','false');document.body.classList.remove('panorama-active');loadSessionMusic()
+  ;[1,2,3].forEach(index=>{const video=$(`#alvorada-record-${index}`);video?.pause();video?.remove()});$('#alvorada-experience')?.remove();const rig=$('#rig');rig.removeAttribute('animation__alvorada');rig.setAttribute('position','0 1.65 0');Array.from($('a-scene').children).forEach(element=>{if(element.dataset.visitVisibility!==undefined){element.setAttribute('visible',element.dataset.visitVisibility==='true');delete element.dataset.visitVisibility}});$('#camera').setAttribute('fov','72');$('#experience-exit').setAttribute('visible','false');document.body.classList.remove('panorama-active');loadSessionMusic()
 }
 async function exitExperience(){
   if($('#visit-panorama'))exitPanorama()
