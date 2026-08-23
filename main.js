@@ -168,6 +168,43 @@ AFRAME.registerComponent('canvas-label',{
   remove(){this.texture?.dispose()}
 })
 
+AFRAME.registerComponent('waving-guide',{
+  schema:{src:{default:''}},
+  init(){
+    this.canvas=document.createElement('canvas');this.canvas.width=768;this.canvas.height=1536
+    this.ctx=this.canvas.getContext('2d');this.ready=false
+    this.image=new Image();this.image.crossOrigin='anonymous'
+    this.image.onload=()=>{
+      const work=document.createElement('canvas');work.width=this.canvas.width;work.height=this.canvas.height
+      const context=work.getContext('2d');context.drawImage(this.image,0,0,work.width,work.height)
+      const pixels=context.getImageData(0,0,work.width,work.height)
+      for(let i=0;i<pixels.data.length;i+=4){
+        const r=pixels.data[i],g=pixels.data[i+1],b=pixels.data[i+2]
+        const max=Math.max(r,g,b),min=Math.min(r,g,b),saturation=max?((max-min)/max):0
+        if(max>218&&saturation<.075)pixels.data[i+3]=0
+      }
+      context.putImageData(pixels,0,0)
+      this.body=work
+      this.arm=document.createElement('canvas');this.arm.width=310;this.arm.height=650
+      this.arm.getContext('2d').drawImage(work,0,0,310,650,0,0,310,650)
+      context.clearRect(0,0,310,650)
+      this.texture=new THREE.CanvasTexture(this.canvas);this.texture.colorSpace=THREE.SRGBColorSpace
+      const apply=()=>{const mesh=this.el.getObject3D('mesh');if(!mesh)return;mesh.material.map=this.texture;mesh.material.color.set('#fff');mesh.material.transparent=true;mesh.material.alphaTest=.025;mesh.material.side=THREE.DoubleSide;mesh.material.needsUpdate=true}
+      apply();this.el.addEventListener('object3dset',apply,{once:true});this.ready=true
+    }
+    this.image.src=this.data.src
+  },
+  tick(time){
+    if(!this.ready)return
+    const context=this.ctx,w=this.canvas.width,h=this.canvas.height
+    context.clearRect(0,0,w,h);context.drawImage(this.body,0,0)
+    const pivotX=238,pivotY=350,angle=Math.sin(time*.0045)*.18
+    context.save();context.translate(pivotX,pivotY);context.rotate(angle);context.translate(-pivotX,-pivotY);context.drawImage(this.arm,0,0);context.restore()
+    this.texture.needsUpdate=true
+  },
+  remove(){this.texture?.dispose()}
+})
+
 function make(tag,attributes={}){const element=document.createElement(tag);Object.entries(attributes).forEach(([key,value])=>element.setAttribute(key,value));return element}
 function canvasLabel(text,{width=3.4,height=.5,position='0 0 .15',color='#073F73',fontSize=58,align='left',weight='600'}={}){const plane=make('a-plane',{width:String(width),height:String(height),position,material:'shader:flat;transparent:true;opacity:1;color:#fff'});plane.setAttribute('canvas-label',{text,color,fontSize,align,weight});return plane}
 
@@ -197,7 +234,7 @@ function enterPanorama(panorama){
   })
   scene.append(sky)
   const guide=monumentGuides[panorama]
-  if(guide){const host=make('a-entity',{id:'visit-guide',position:'-2.35 0 -5.4',animation:'property:rotation;from:0 -2 -1;to:0 2 1;dir:alternate;loop:true;dur:1100;easing:easeInOutSine'});host.append(make('a-image',{src:assetPath(guide.image),width:'1.72',height:'3.45',position:'0 1.72 0',material:'shader:flat;transparent:true;alphaTest:.03;side:double'}));host.append(make('a-plane',{width:'2.85',height:'.86',position:'0 -.22 .01',material:'shader:flat;color:#073F73;opacity:.96'}));host.append(canvasLabel(`${guide.name}\n${guide.role}`,{width:2.62,height:.68,position:'0 -.22 .03',color:'#FFFFFF',fontSize:43,align:'center',weight:'700'}));scene.append(host)}
+  if(guide){const host=make('a-entity',{id:'visit-guide',position:'-2.35 0 -5.4'});const character=make('a-plane',{width:'1.72',height:'3.45',position:'0 1.72 0',material:'shader:flat;transparent:true;alphaTest:.025;side:double'});character.setAttribute('waving-guide',{src:assetPath(guide.image)});host.append(character);host.append(make('a-plane',{width:'3.15',height:'.86',position:'0 -.22 .01',material:'shader:flat;color:#073F73;opacity:.96'}));host.append(canvasLabel(`${guide.name}\n${guide.role}`,{width:2.95,height:.68,position:'0 -.22 .03',color:'#FFFFFF',fontSize:45,align:'center',weight:'700'}));scene.append(host)}
   $('#camera').setAttribute('fov',sbsActive?'90':'82')
   $('#experience-exit').setAttribute('visible','true')
   document.body.classList.add('panorama-active')
