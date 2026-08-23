@@ -42,6 +42,7 @@ const sessions = [
   {
     title:'FESTAS E VIDA PÚBLICA',
     items:[
+      {title:'ALVORADA DOS HUMILDES',photos:['/alvorada/cartaz.jpeg'],experience:'alvorada',caption:'Na madrugada de 15 de junho, músicos e moradores percorrem as ruas de Uauá e veem o dia nascer em celebração a São João Batista. A tradição foi declarada Patrimônio Cultural Imaterial do município pela Lei nº 676/2023.'},
       {title:'CARNAVAL DE UAUÁ',photos:['/celebracoes/carnaval.jpg','/celebracoes/carnaval-1981.jpg'],caption:'Registros do carnaval uauaense e da ocupação festiva das ruas. Uma das fotografias documenta o carnaval de 1981.'},
       {title:'TRIO JANGADA',photos:['/celebracoes/trio-jangada-01.jpg','/celebracoes/trio-jangada-02.jpg','/celebracoes/trio-jangada-03.jpg'],caption:'Criado em 1979 por Veinho, Nenenzinho, João Potó e colaboradores, o Trio Jangada tornou-se marca do carnaval de Uauá.'},
       {title:'CAMPANHA DE PEDRO PEIXINHO',photos:['/celebracoes/campanha-pedro-peixinho.jpg'],caption:'Material da campanha eleitoral de Pedro Peixinho, documento da mobilização política e da comunicação pública no município.'},
@@ -175,6 +176,27 @@ function addVisitButton(panel,panorama){
   const label=canvasLabel('VISITE ESTA ÁREA',{width:2.52,height:.38,position:'0 -2.25 .24',color:'#FFFFFF',fontSize:64,align:'center',weight:'700'})
   panel.append(target);panel.append(label);bindGaze(target,()=>enterPanorama(panorama))
 }
+function addAlvoradaButton(panel){
+  const target=make('a-plane',{class:'interactive gaze-target',width:'3.05',height:'.52',position:'0 -2.25 .22',material:'shader:flat;color:#0867C7'})
+  const label=canvasLabel('VIVER A ALVORADA',{width:2.82,height:.38,position:'0 -2.25 .24',color:'#FFFFFF',fontSize:62,align:'center',weight:'700'})
+  panel.append(target);panel.append(label);bindGaze(target,enterAlvorada)
+}
+function hideMuseumForExperience(root){
+  const scene=$('a-scene'),rig=$('#rig');Array.from(scene.children).forEach(element=>{if(element===rig||element.id==='experience-exit'||element.tagName==='A-ASSETS'||element===root)return;element.dataset.visitVisibility=String(element.getAttribute('visible')!==false);element.setAttribute('visible','false')})
+}
+function enterAlvorada(){
+  if($('#alvorada-experience'))return
+  sessionAudio.pause();const scene=$('a-scene'),root=make('a-entity',{id:'alvorada-experience'});hideMuseumForExperience(root)
+  root.append(make('a-sky',{color:'#101B46',radius:'48',material:'shader:flat;side:back',animation:'property:material.color;from:#101B46;to:#E88A4A;dur:90000;easing:linear'}))
+  root.append(make('a-plane',{width:'13',height:'95',rotation:'-90 0 0',position:'0 -.04 -35',material:'color:#34394A;roughness:1'}))
+  for(let z=3;z>-78;z-=7){for(const side of[-1,1]){const house=make('a-box',{width:`${3.4+(Math.abs(z)%3)}`,height:'3.3',depth:'5.2',position:`${side*5.2} 1.6 ${z}`,material:`color:${side<0?'#536A86':'#765A68'};roughness:1`});root.append(house)}}
+  const colors=['#FDBA18','#E43D4E','#0B67C8','#39A66D'];for(let z=1;z>-78;z-=5){const line=make('a-entity',{position:`0 4.5 ${z}`});for(let i=-4;i<=4;i++){line.append(make('a-triangle',{vertexA:'-.28 .18 0',vertexB:'.28 .18 0',vertexC:'0 -.42 0',position:`${i*1.1} 0 0`,material:`shader:flat;color:${colors[Math.abs(i+z+20)%colors.length|0]};side:double`}))}root.append(line)}
+  const crowdColors=['#E7C8A0','#C46C4B','#3172A8','#D9A52E','#8A3F67'];for(let i=0;i<42;i++){const side=i%2?-1:1,z=1-(i*1.75),x=side*(1.1+(i%4)*.52),person=make('a-entity',{position:`${x} 0 ${z}`,animation:`property:position;to:${x+side*.35} 0 ${z-8};dur:${6500+(i%5)*700};loop:true;easing:linear`});person.append(make('a-cylinder',{radius:'.23',height:'1.25',position:'0 .75 0',material:`color:${crowdColors[i%crowdColors.length]};roughness:1`}));person.append(make('a-sphere',{radius:'.2',position:'0 1.56 0',material:'color:#98694F;roughness:1'}));root.append(person)}
+  root.append(canvasLabel('ALVORADA DOS HUMILDES · 15 DE JUNHO · UAUÁ',{width:7.5,height:.55,position:'0 3.7 -8',color:'#FDBA18',fontSize:62,align:'center',weight:'700'}));scene.append(root)
+  const rig=$('#rig');rig.setAttribute('position','0 1.65 2');rig.setAttribute('animation__alvorada','property:position;to:0 1.65 -72;dur:90000;easing:linear')
+  const audio=document.createElement('video');audio.id='alvorada-audio';audio.src=assetPath('/alvorada/registro-01.mp4');audio.playsInline=true;audio.loop=true;audio.style.display='none';document.body.append(audio);audio.play().catch(()=>{})
+  $('#experience-exit').setAttribute('visible','true');document.body.classList.add('panorama-active')
+}
 function enterPanorama(panorama){
   if($('#visit-panorama'))return
   const scene=$('a-scene'),rig=$('#rig'),sky=make('a-sky',{id:'visit-panorama',src:assetPath(panorama),radius:'45',rotation:'0 -90 0',material:'shader:flat;side:back'})
@@ -199,8 +221,12 @@ function exitPanorama(){
   $('#experience-exit').setAttribute('visible','false')
   document.body.classList.remove('panorama-active')
 }
+function exitAlvorada(){
+  $('#alvorada-audio')?.pause();$('#alvorada-audio')?.remove();$('#alvorada-experience')?.remove();const rig=$('#rig');rig.removeAttribute('animation__alvorada');rig.setAttribute('position','0 1.65 0');Array.from($('a-scene').children).forEach(element=>{if(element.dataset.visitVisibility!==undefined){element.setAttribute('visible',element.dataset.visitVisibility==='true');delete element.dataset.visitVisibility}});$('#camera').setAttribute('fov','72');$('#experience-exit').setAttribute('visible','false');document.body.classList.remove('panorama-active');loadSessionMusic()
+}
 async function exitExperience(){
   if($('#visit-panorama'))exitPanorama()
+  if($('#alvorada-experience'))exitAlvorada()
   $('#experience-exit').setAttribute('visible','false')
 }
 function fitPhoto(src,x,maxWidth,maxHeight){const resolvedSrc=assetPath(src),photo=make('a-image',{src:resolvedSrc,width:String(maxWidth),height:String(maxHeight),position:`${x} 0 0`,material:'shader:flat'}),image=new Image();image.onload=()=>{const ratio=image.naturalWidth/image.naturalHeight,box=maxWidth/maxHeight;if(ratio>box){photo.setAttribute('width',maxWidth);photo.setAttribute('height',maxWidth/ratio)}else{photo.setAttribute('height',maxHeight);photo.setAttribute('width',maxHeight*ratio)}};image.src=resolvedSrc;return photo}
@@ -212,7 +238,7 @@ function createPhotoPanel(item,index,total,sessionTitle){
   const group=make('a-entity',{position:'0 .5 .16'}),count=item.photos.length,layouts=count===3?[[-1.25,1.12,1.55],[0,1.12,1.55],[1.25,1.12,1.55]]:count===2?[[-.96,1.72,1.55],[.96,1.72,1.55]]:[[0,3.35,1.6]]
   item.photos.forEach((src,i)=>{const[x,width,height]=layouts[i];group.append(fitPhoto(src,x,width,height))});panel.append(group)
   panel.append(canvasLabel(item.caption,{width:3.6,height:1.48,position:'0 -1.15 .15',color:'#0B3152',fontSize:62,weight:'700'}))
-  if(item.panorama)addVisitButton(panel,item.panorama);return panel
+  if(item.panorama)addVisitButton(panel,item.panorama);if(item.experience==='alvorada')addAlvoradaButton(panel);return panel
 }
 
 function createPoemPanel(poem,index,total,sessionTitle){
