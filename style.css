@@ -14,7 +14,7 @@ a-scene canvas{display:block!important;width:100%!important;height:100%!importan
 .identity b{font:800 13px 'Barlow Condensed',sans-serif;letter-spacing:2.2px;color:#fff}
 .identity small{font-size:7px;letter-spacing:2px;color:#cfe5f6}
 .hud-actions{display:flex;gap:9px;pointer-events:auto}
-.hud button{pointer-events:auto;border:1px solid #fdbb1888;border-radius:30px;padding:11px 18px;background:#073f73df;color:#fff;font:700 9px 'Montserrat';letter-spacing:1.5px;cursor:pointer;backdrop-filter:blur(8px)}
+.hud button{pointer-events:auto;border:2px solid #fdbb18;border-radius:30px;min-height:50px;padding:13px 22px;background:#073f73f2;color:#fff;font:800 14px 'Montserrat';letter-spacing:1.2px;cursor:pointer;backdrop-filter:blur(8px)}
 #enter-vr{background:#0b67c8e8;border-color:#fdba18}
 .orientation{position:fixed;z-index:5;bottom:max(25px,env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:12px;color:#fdba18;font-size:8px;letter-spacing:1.8px;pointer-events:none;text-shadow:0 2px 5px #002a50}
 .orientation i{display:block;width:28px;height:20px;border:1px solid #fdba18;border-radius:12px;position:relative}
@@ -43,7 +43,7 @@ body.pseudo-fullscreen .hud{padding-top:max(10px,env(safe-area-inset-top))}
   .identity small{display:none}
   .identity>img{width:120px;height:52px}
   .hud-actions{position:fixed;z-index:12;left:max(12px,env(safe-area-inset-left));right:max(12px,env(safe-area-inset-right));bottom:max(14px,env(safe-area-inset-bottom));display:grid;grid-template-columns:1fr 1fr;gap:10px}
-  .hud button{min-height:52px;padding:12px 8px;font-size:10px;font-weight:700;letter-spacing:1px;background:#073f73f2;box-shadow:0 8px 28px #001b3a88}
+  .hud button{min-height:58px;padding:13px 10px;font-size:15px;font-weight:800;letter-spacing:.7px;background:#073f73f2;box-shadow:0 8px 28px #001b3a88}
   #enter-vr{background:#0b67c8f2}
   .orientation{bottom:max(82px,calc(env(safe-area-inset-bottom) + 82px));width:100%;justify-content:center}
   .orientation span{font-size:7px}
