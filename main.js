@@ -10,8 +10,7 @@ const sessions = [
       {title:'IGREJA SÃO JOÃO BATISTA',photos:['/monumentos/igreja-sao-joao-01.jpg','/monumentos/igreja-sao-joao-02.jpg'],panorama:'/panoramas/igreja-sao-joao.png',caption:'A construção da Igreja Matriz começou em 1921. A paróquia foi fundada em 1923.'},
       {title:'PRAÇA DA IGREJA',photos:['/monumentos/praca-igreja.jpg'],panorama:'/panoramas/praca-igreja.png',caption:'Registro das transformações da Praça São João Batista, no centro de Uauá.'},
       {title:'PRIMEIRA ESCOLA DE DATILOGRAFIA',photos:['/monumentos/escola-datilografia.jpg'],panorama:'/panoramas/escola-datilografia.png',caption:'Iniciativa do Padre Osvaldo, a escola foi inaugurada em 1976 e ofereceu formação profissional.'},
-      {title:'PREFEITURA MUNICIPAL DE UAUÁ',photos:['/monumentos/prefeitura.jpg'],panorama:'/panoramas/prefeitura.png',caption:'Sede administrativa de Uauá. O distrito foi criado em 1905; o município foi emancipado em 1926 e restaurado definitivamente em 1933.'},
-      {title:'ALVORADA DOS HUMILDES',photos:['/alvorada/cartaz.jpeg'],experience:'alvorada',caption:'Na madrugada de 15 de junho, músicos e moradores percorrem as ruas de Uauá e veem o dia nascer em celebração a São João Batista. A tradição foi declarada Patrimônio Cultural Imaterial do município pela Lei nº 676/2023.'}
+      {title:'PREFEITURA MUNICIPAL DE UAUÁ',photos:['/monumentos/prefeitura.jpg'],panorama:'/panoramas/prefeitura.png',caption:'Sede administrativa de Uauá. O distrito foi criado em 1905; o município foi emancipado em 1926 e restaurado definitivamente em 1933.'}
     ],
     poem:{author:'GILDEMAR DE SENA',work:'Cordelizando o cordel',lines:'Literatura que vem da rima\nDe fácil compreensão\nQue falam de fatos já ocorridos\nE das façanhas de Lampião'}
   },
@@ -176,23 +175,8 @@ function addVisitButton(panel,panorama){
   const label=canvasLabel('VISITE ESTA ÁREA',{width:2.52,height:.38,position:'0 -2.25 .24',color:'#FFFFFF',fontSize:64,align:'center',weight:'700'})
   panel.append(target);panel.append(label);bindGaze(target,()=>enterPanorama(panorama))
 }
-function addAlvoradaButton(panel){
-  const target=make('a-plane',{class:'interactive gaze-target',width:'3.05',height:'.52',position:'0 -2.25 .22',material:'shader:flat;color:#0867C7'})
-  const label=canvasLabel('VIVER A ALVORADA',{width:2.82,height:.38,position:'0 -2.25 .24',color:'#FFFFFF',fontSize:62,align:'center',weight:'700'})
-  panel.append(target);panel.append(label);bindGaze(target,enterAlvorada)
-}
 function hideMuseumForExperience(root){
   const scene=$('a-scene'),rig=$('#rig');Array.from(scene.children).forEach(element=>{if(element===rig||element.id==='experience-exit'||element.tagName==='A-ASSETS'||element===root)return;element.dataset.visitVisibility=String(element.getAttribute('visible')!==false);element.setAttribute('visible','false')})
-}
-function enterAlvorada(){
-  if($('#alvorada-experience'))return
-  sessionAudio.pause();const scene=$('a-scene'),root=make('a-entity',{id:'alvorada-experience'});hideMuseumForExperience(root)
-  const stages=['trajeto-01-concentracao.png','trajeto-02-caminhada.png','trajeto-03-chegada.png']
-  const sky=make('a-sky',{id:'alvorada-sky',src:assetPath(`/alvorada/${stages[0]}`),radius:'48',rotation:'0 -90 0',material:'shader:flat;side:back'});root.append(sky);scene.append(root)
-  let stage=0;window.alvoradaRouteTimer=setInterval(()=>{stage=(stage+1)%stages.length;sky.setAttribute('src',assetPath(`/alvorada/${stages[stage]}`));sky.setAttribute('animation__passo',`property:rotation;from:0 ${-90+stage*.8} 0;to:0 ${-89.2+stage*.8} 0;dur:15000;easing:linear`)},15000)
-  const rig=$('#rig');rig.setAttribute('position','0 1.65 0');rig.setAttribute('animation__alvorada','property:position;from:-.035 1.61 0;to:.035 1.70 0;dur:690;dir:alternate;loop:true;easing:easeInOutSine')
-  const audio=document.createElement('video');audio.id='alvorada-audio';audio.src=assetPath('/alvorada/registro-01.mp4');audio.playsInline=true;audio.loop=true;audio.style.display='none';document.body.append(audio);audio.play().catch(()=>{})
-  $('#experience-exit').setAttribute('visible','true');document.body.classList.add('panorama-active')
 }
 function enterPanorama(panorama){
   if($('#visit-panorama'))return
@@ -218,12 +202,8 @@ function exitPanorama(){
   $('#experience-exit').setAttribute('visible','false')
   document.body.classList.remove('panorama-active')
 }
-function exitAlvorada(){
-  clearInterval(window.alvoradaRouteTimer);window.alvoradaRouteTimer=null;$('#alvorada-audio')?.pause();$('#alvorada-audio')?.remove();$('#alvorada-experience')?.remove();const rig=$('#rig');rig.removeAttribute('animation__alvorada');rig.setAttribute('position','0 1.65 0');Array.from($('a-scene').children).forEach(element=>{if(element.dataset.visitVisibility!==undefined){element.setAttribute('visible',element.dataset.visitVisibility==='true');delete element.dataset.visitVisibility}});$('#camera').setAttribute('fov','72');$('#experience-exit').setAttribute('visible','false');document.body.classList.remove('panorama-active');loadSessionMusic()
-}
 async function exitExperience(){
   if($('#visit-panorama'))exitPanorama()
-  if($('#alvorada-experience'))exitAlvorada()
   $('#experience-exit').setAttribute('visible','false')
 }
 function fitPhoto(src,x,maxWidth,maxHeight){const resolvedSrc=assetPath(src),photo=make('a-image',{src:resolvedSrc,width:String(maxWidth),height:String(maxHeight),position:`${x} 0 0`,material:'shader:flat'}),image=new Image();image.onload=()=>{const ratio=image.naturalWidth/image.naturalHeight,box=maxWidth/maxHeight;if(ratio>box){photo.setAttribute('width',maxWidth);photo.setAttribute('height',maxWidth/ratio)}else{photo.setAttribute('height',maxHeight);photo.setAttribute('width',maxHeight*ratio)}};image.src=resolvedSrc;return photo}
@@ -235,7 +215,7 @@ function createPhotoPanel(item,index,total,sessionTitle){
   const group=make('a-entity',{position:'0 .5 .16'}),count=item.photos.length,layouts=count===3?[[-1.25,1.12,1.55],[0,1.12,1.55],[1.25,1.12,1.55]]:count===2?[[-.96,1.72,1.55],[.96,1.72,1.55]]:[[0,3.35,1.6]]
   item.photos.forEach((src,i)=>{const[x,width,height]=layouts[i];group.append(fitPhoto(src,x,width,height))});panel.append(group)
   panel.append(canvasLabel(item.caption,{width:3.6,height:1.48,position:'0 -1.15 .15',color:'#0B3152',fontSize:62,weight:'700'}))
-  if(item.panorama)addVisitButton(panel,item.panorama);if(item.experience==='alvorada')addAlvoradaButton(panel);return panel
+  if(item.panorama)addVisitButton(panel,item.panorama);return panel
 }
 
 function createPoemPanel(poem,index,total,sessionTitle){
