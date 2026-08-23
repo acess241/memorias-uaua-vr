@@ -11,7 +11,7 @@ const sessions = [
       {title:'PRAÇA DA IGREJA',photos:['/monumentos/praca-igreja.jpg'],panorama:'/panoramas/praca-igreja.png',caption:'Registro das transformações da Praça São João Batista, no centro de Uauá.'},
       {title:'PRIMEIRA ESCOLA DE DATILOGRAFIA',photos:['/monumentos/escola-datilografia.jpg'],panorama:'/panoramas/escola-datilografia.png',caption:'Iniciativa do Padre Osvaldo, a escola foi inaugurada em 1976 e ofereceu formação profissional.'},
       {title:'PREFEITURA MUNICIPAL DE UAUÁ',photos:['/monumentos/prefeitura.jpg'],panorama:'/panoramas/prefeitura.png',caption:'Sede administrativa de Uauá. O distrito foi criado em 1905; o município foi emancipado em 1926 e restaurado definitivamente em 1933.'},
-      {title:'CÂMARA MUNICIPAL DE UAUÁ',photos:['/monumentos/camara-municipal.jpg'],panorama:'/panoramas/camara-municipal.png',caption:'Sede do Poder Legislativo municipal de Uauá. O edifício integra o conjunto urbano junto à Praça São João Batista e à Igreja Matriz, formando um espaço de vida pública, memória política e convivência da cidade.'}
+      {title:'CÂMARA MUNICIPAL DE UAUÁ',photos:['/monumentos/camara-municipal.jpg'],panorama:'/panoramas/camara-municipal.png',caption:'Sede do Poder Legislativo de Uauá, localizada junto à Praça São João Batista. O edifício integra a memória política e a vida pública do município.'}
     ],
     poem:{author:'GILDEMAR DE SENA',work:'Cordelizando o cordel',lines:'Literatura que vem da rima\nDe fácil compreensão\nQue falam de fatos já ocorridos\nE das façanhas de Lampião'}
   },
@@ -182,35 +182,20 @@ AFRAME.registerComponent('waving-guide',{
       const work=document.createElement('canvas');work.width=this.canvas.width;work.height=this.canvas.height
       const context=work.getContext('2d');context.drawImage(this.image,0,0,work.width,work.height)
       const pixels=context.getImageData(0,0,work.width,work.height)
-      for(let i=0;i<pixels.data.length;i+=4){
-        const r=pixels.data[i],g=pixels.data[i+1],b=pixels.data[i+2]
-        const max=Math.max(r,g,b),min=Math.min(r,g,b),saturation=max?((max-min)/max):0
-        if(max>218&&saturation<.075)pixels.data[i+3]=0
-      }
+      const width=work.width,height=work.height,total=width*height,visited=new Uint8Array(total),queue=new Int32Array(total);let head=0,tail=0
+      const isBackground=index=>{const offset=index*4,r=pixels.data[offset],g=pixels.data[offset+1],b=pixels.data[offset+2];return Math.max(r,g,b)>202&&Math.max(r,g,b)-Math.min(r,g,b)<30}
+      const enqueue=index=>{if(index<0||index>=total||visited[index]||!isBackground(index))return;visited[index]=1;queue[tail++]=index}
+      for(let x=0;x<width;x++){enqueue(x);enqueue((height-1)*width+x)}
+      for(let y=0;y<height;y++){enqueue(y*width);enqueue(y*width+width-1)}
+      while(head<tail){const index=queue[head++],x=index%width;pixels.data[index*4+3]=0;if(x>0)enqueue(index-1);if(x<width-1)enqueue(index+1);if(index>=width)enqueue(index-width);if(index<total-width)enqueue(index+width)}
       context.putImageData(pixels,0,0)
       this.body=work
+      this.ctx.clearRect(0,0,this.canvas.width,this.canvas.height);this.ctx.drawImage(this.body,0,0)
       this.texture=new THREE.CanvasTexture(this.canvas);this.texture.colorSpace=THREE.SRGBColorSpace
       const apply=()=>{const mesh=this.el.getObject3D('mesh');if(!mesh)return;mesh.material.map=this.texture;mesh.material.color.set('#fff');mesh.material.transparent=true;mesh.material.alphaTest=.025;mesh.material.side=THREE.DoubleSide;mesh.material.needsUpdate=true}
-      apply();this.el.addEventListener('object3dset',apply,{once:true});this.ready=true
+      apply();this.el.addEventListener('object3dset',apply,{once:true});this.ready=true;this.texture.needsUpdate=true
     }
     this.image.src=this.data.src
-  },
-  tick(time){
-    if(!this.ready)return
-    const context=this.ctx,w=this.canvas.width,h=this.canvas.height,cell=24,wave=Math.sin(time*.0045)
-    context.clearRect(0,0,w,h)
-    for(let y=0;y<h;y+=cell){
-      for(let x=0;x<w;x+=cell){
-        let dx=0,dy=0
-        if(x<w*.43&&y<h*.43){
-          const vertical=Math.max(0,1-y/(h*.43)),horizontal=Math.max(0,1-x/(w*.43)),influence=vertical*horizontal
-          dx=wave*34*influence;dy=Math.abs(wave)*8*influence
-        }
-        const cw=Math.min(cell,w-x),ch=Math.min(cell,h-y)
-        context.drawImage(this.body,x,y,cw,ch,x+dx,y+dy,cw+1,ch+1)
-      }
-    }
-    this.texture.needsUpdate=true
   },
   remove(){this.texture?.dispose()}
 })
