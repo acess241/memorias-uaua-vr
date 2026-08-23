@@ -187,13 +187,8 @@ function hideMuseumForExperience(root){
 function enterAlvorada(){
   if($('#alvorada-experience'))return
   sessionAudio.pause();const scene=$('a-scene'),root=make('a-entity',{id:'alvorada-experience'});hideMuseumForExperience(root)
-  root.append(make('a-sky',{color:'#101B46',radius:'48',material:'shader:flat;side:back',animation:'property:material.color;from:#101B46;to:#E88A4A;dur:90000;easing:linear'}))
-  root.append(make('a-plane',{width:'13',height:'95',rotation:'-90 0 0',position:'0 -.04 -35',material:'color:#34394A;roughness:1'}))
-  for(let z=3;z>-78;z-=7){for(const side of[-1,1]){const house=make('a-box',{width:`${3.4+(Math.abs(z)%3)}`,height:'3.3',depth:'5.2',position:`${side*5.2} 1.6 ${z}`,material:`color:${side<0?'#536A86':'#765A68'};roughness:1`});root.append(house)}}
-  const colors=['#FDBA18','#E43D4E','#0B67C8','#39A66D'];for(let z=1;z>-78;z-=5){const line=make('a-entity',{position:`0 4.5 ${z}`});for(let i=-4;i<=4;i++){line.append(make('a-triangle',{vertexA:'-.28 .18 0',vertexB:'.28 .18 0',vertexC:'0 -.42 0',position:`${i*1.1} 0 0`,material:`shader:flat;color:${colors[Math.abs(i+z+20)%colors.length|0]};side:double`}))}root.append(line)}
-  const crowdColors=['#E7C8A0','#C46C4B','#3172A8','#D9A52E','#8A3F67'];for(let i=0;i<42;i++){const side=i%2?-1:1,z=1-(i*1.75),x=side*(1.1+(i%4)*.52),person=make('a-entity',{position:`${x} 0 ${z}`,animation:`property:position;to:${x+side*.35} 0 ${z-8};dur:${6500+(i%5)*700};loop:true;easing:linear`});person.append(make('a-cylinder',{radius:'.23',height:'1.25',position:'0 .75 0',material:`color:${crowdColors[i%crowdColors.length]};roughness:1`}));person.append(make('a-sphere',{radius:'.2',position:'0 1.56 0',material:'color:#98694F;roughness:1'}));root.append(person)}
-  root.append(canvasLabel('ALVORADA DOS HUMILDES · 15 DE JUNHO · UAUÁ',{width:7.5,height:.55,position:'0 3.7 -8',color:'#FDBA18',fontSize:62,align:'center',weight:'700'}));scene.append(root)
-  const rig=$('#rig');rig.setAttribute('position','0 1.65 2');rig.setAttribute('animation__alvorada','property:position;to:0 1.65 -72;dur:90000;easing:linear')
+  root.append(make('a-sky',{src:assetPath('/alvorada/panorama-alvorada.png'),radius:'48',rotation:'0 -90 0',material:'shader:flat;side:back',animation:'property:rotation;from:0 -90 0;to:0 -86 0;dur:90000;easing:linear'}));scene.append(root)
+  const rig=$('#rig');rig.setAttribute('position','0 1.65 0');rig.setAttribute('animation__alvorada','property:position;from:0 1.62 0;to:0 1.69 0;dur:720;dir:alternate;loop:true;easing:easeInOutSine')
   const audio=document.createElement('video');audio.id='alvorada-audio';audio.src=assetPath('/alvorada/registro-01.mp4');audio.playsInline=true;audio.loop=true;audio.style.display='none';document.body.append(audio);audio.play().catch(()=>{})
   $('#experience-exit').setAttribute('visible','true');document.body.classList.add('panorama-active')
 }
