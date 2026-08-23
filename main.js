@@ -10,7 +10,8 @@ const sessions = [
       {title:'IGREJA SÃO JOÃO BATISTA',photos:['/monumentos/igreja-sao-joao-01.jpg','/monumentos/igreja-sao-joao-02.jpg'],panorama:'/panoramas/igreja-sao-joao.png',caption:'A construção da Igreja Matriz começou em 1921. A paróquia foi fundada em 1923.'},
       {title:'PRAÇA DA IGREJA',photos:['/monumentos/praca-igreja.jpg'],panorama:'/panoramas/praca-igreja.png',caption:'Registro das transformações da Praça São João Batista, no centro de Uauá.'},
       {title:'PRIMEIRA ESCOLA DE DATILOGRAFIA',photos:['/monumentos/escola-datilografia.jpg'],panorama:'/panoramas/escola-datilografia.png',caption:'Iniciativa do Padre Osvaldo, a escola foi inaugurada em 1976 e ofereceu formação profissional.'},
-      {title:'PREFEITURA MUNICIPAL DE UAUÁ',photos:['/monumentos/prefeitura.jpg'],panorama:'/panoramas/prefeitura.png',caption:'Sede administrativa de Uauá. O distrito foi criado em 1905; o município foi emancipado em 1926 e restaurado definitivamente em 1933.'}
+      {title:'PREFEITURA MUNICIPAL DE UAUÁ',photos:['/monumentos/prefeitura.jpg'],panorama:'/panoramas/prefeitura.png',caption:'Sede administrativa de Uauá. O distrito foi criado em 1905; o município foi emancipado em 1926 e restaurado definitivamente em 1933.'},
+      {title:'ALVORADA DOS HUMILDES',photos:['/alvorada/cartaz.jpeg'],experience:'alvorada',caption:'Na madrugada de 15 de junho, músicos e moradores percorrem as ruas de Uauá e veem o dia nascer em celebração a São João Batista. A tradição foi declarada Patrimônio Cultural Imaterial do município pela Lei nº 676/2023.'}
     ],
     poem:{author:'GILDEMAR DE SENA',work:'Cordelizando o cordel',lines:'Literatura que vem da rima\nDe fácil compreensão\nQue falam de fatos já ocorridos\nE das façanhas de Lampião'}
   },
@@ -42,7 +43,6 @@ const sessions = [
   {
     title:'FESTAS E VIDA PÚBLICA',
     items:[
-      {title:'ALVORADA DOS HUMILDES',photos:['/alvorada/cartaz.jpeg'],experience:'alvorada',caption:'Na madrugada de 15 de junho, músicos e moradores percorrem as ruas de Uauá e veem o dia nascer em celebração a São João Batista. A tradição foi declarada Patrimônio Cultural Imaterial do município pela Lei nº 676/2023.'},
       {title:'CARNAVAL DE UAUÁ',photos:['/celebracoes/carnaval.jpg','/celebracoes/carnaval-1981.jpg'],caption:'Registros do carnaval uauaense e da ocupação festiva das ruas. Uma das fotografias documenta o carnaval de 1981.'},
       {title:'TRIO JANGADA',photos:['/celebracoes/trio-jangada-01.jpg','/celebracoes/trio-jangada-02.jpg','/celebracoes/trio-jangada-03.jpg'],caption:'Criado em 1979 por Veinho, Nenenzinho, João Potó e colaboradores, o Trio Jangada tornou-se marca do carnaval de Uauá.'},
       {title:'CAMPANHA DE PEDRO PEIXINHO',photos:['/celebracoes/campanha-pedro-peixinho.jpg'],caption:'Material da campanha eleitoral de Pedro Peixinho, documento da mobilização política e da comunicação pública no município.'},
@@ -246,9 +246,9 @@ function createPoemPanel(poem,index,total,sessionTitle){
 }
 
 function renderSession(){
-  const room=$('#monuments-room'),session=sessions[currentSession],total=session.items.length+1
+  const room=$('#monuments-room'),session=sessions[currentSession],showPoem=currentSession!==0,total=session.items.length+(showPoem?1:0)
   while(room.firstChild)room.removeChild(room.firstChild)
-  session.items.forEach((item,index)=>room.append(createPhotoPanel(item,index,total,session.title)));room.append(createPoemPanel(session.poem,total-1,total,session.title))
+  session.items.forEach((item,index)=>room.append(createPhotoPanel(item,index,total,session.title)));if(showPoem)room.append(createPoemPanel(session.poem,total-1,total,session.title))
   $('.identity b').textContent=`MUSEU PÁTRIA DOS VAGALUMES · ${session.title}`
   room.setAttribute('animation__enter','property:scale;from:.75 .75 .75;to:1 1 1;dur:650;easing:easeOutBack')
   loadSessionMusic()
