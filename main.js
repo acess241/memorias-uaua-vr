@@ -82,7 +82,8 @@ const monumentGuides={
   '/panoramas/igreja-sao-joao.png':{name:'MESTRE CAVACHÃO',role:'CANTOR, COMPOSITOR E MEMORIALISTA',image:'/guias/mestre-cavachao.png'},
   '/panoramas/praca-igreja.png':{name:'DEDÉ DO FOTO',role:'PERSONAGEM DA CULTURA SERTANEJA',image:'/guias/dede-do-foto.png'},
   '/panoramas/escola-datilografia.png':{name:'MARIANE CARDOSO',role:'POETA DE UAUÁ',image:'/guias/mariane-cardoso.png'},
-  '/panoramas/prefeitura.png':{name:'VEINHO',role:'MÚSICA, HUMOR E MEMÓRIA ORAL DE UAUÁ',image:'/guias/veinho.png'}
+  '/panoramas/prefeitura.png':{name:'VEINHO',role:'MÚSICA, HUMOR E MEMÓRIA ORAL DE UAUÁ',image:'/guias/veinho.png'},
+  '/panoramas/camara-municipal.png':{name:'CLÁUDIO BARRIS',role:'CANTOR, COMPOSITOR E POETA DE UAUÁ',image:'/guias/claudio-barris.png'}
 }
 let audioUnlocked=false
 let musicPaused=false
@@ -243,7 +244,7 @@ function enterPanorama(panorama){
   })
   scene.append(sky)
   const guide=monumentGuides[panorama]
-  if(guide){const host=make('a-entity',{id:'visit-guide',position:'-4.8 -.24 -3.4',rotation:'0 55 0'});host.append(make('a-circle',{radius:'1.02',position:'0 .025 .08',rotation:'-90 0 0',scale:'1 .34 1',material:'shader:flat;color:#06182A;transparent:true;opacity:.34;side:double'}));const character=make('a-plane',{width:'2.1',height:'4.2',position:'0 2.1 0',material:'shader:flat;transparent:true;alphaTest:.025;side:double'});character.setAttribute('waving-guide',{src:assetPath(guide.image)});host.append(character);host.append(make('a-plane',{width:'3.65',height:'1.28',position:'-2.85 1.82 .01',material:'shader:flat;color:#073F73;opacity:.98'}));host.append(canvasLabel(guide.name,{width:3.36,height:.46,position:'-2.85 2.09 .03',color:'#FFFFFF',fontSize:82,align:'center',weight:'700'}));host.append(canvasLabel(guide.role,{width:3.3,height:.62,position:'-2.85 1.59 .03',color:'#FDBA18',fontSize:59,align:'center',weight:'700'}));scene.append(host)}
+  if(guide){const host=make('a-entity',{id:'visit-guide',position:'-4.8 -.86 -3.4',rotation:'0 55 0'});host.append(make('a-circle',{radius:'1.02',position:'0 .025 .08',rotation:'-90 0 0',scale:'1 .34 1',material:'shader:flat;color:#06182A;transparent:true;opacity:.34;side:double'}));const character=make('a-plane',{width:'2.1',height:'4.2',position:'0 2.1 0',material:'shader:flat;transparent:true;alphaTest:.025;side:double'});character.setAttribute('waving-guide',{src:assetPath(guide.image)});host.append(character);host.append(make('a-plane',{width:'3.65',height:'1.28',position:'-2.85 2.44 .01',material:'shader:flat;color:#073F73;opacity:.98'}));host.append(canvasLabel(guide.name,{width:3.36,height:.46,position:'-2.85 2.71 .03',color:'#FFFFFF',fontSize:82,align:'center',weight:'700'}));host.append(canvasLabel(guide.role,{width:3.3,height:.62,position:'-2.85 2.21 .03',color:'#FDBA18',fontSize:59,align:'center',weight:'700'}));scene.append(host)}
   $('#camera').setAttribute('fov',sbsActive?'90':'82')
   $('#experience-exit').setAttribute('visible','true')
   document.body.classList.add('panorama-active')
