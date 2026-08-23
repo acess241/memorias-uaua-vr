@@ -73,13 +73,13 @@ const $=selector=>document.querySelector(selector)
 const assetPath=path=>`${import.meta.env.BASE_URL}${path.replace(/^\/+/, '')}`
 const sessionAudio=new Audio()
 const monumentGuides={
-  '/panoramas/belo-monte.png':{name:'ANTÔNIO LOIOLA',image:'/guias/antonio-loiola.png'},
-  '/panoramas/correios.png':{name:'SENHOR ADEMAR',image:'/guias/senhor-ademar.png'},
-  '/panoramas/casa-roque.png':{name:'AUTO BARBOSA',image:'/guias/auto-barbosa.png'},
-  '/panoramas/escola-joao-borges.png':{name:'MIKAL LÔBO',image:'/guias/mikal-lobo.png'},
-  '/panoramas/igreja-sao-joao.png':{name:'MESTRE CAVACHÃO',image:'/guias/mestre-cavachao.png'},
-  '/panoramas/praca-igreja.png':{name:'DEDÉ DO FOTO',image:'/guias/dede-do-foto.png'},
-  '/panoramas/prefeitura.png':{name:'VEINHO',image:'/guias/veinho.png'}
+  '/panoramas/belo-monte.png':{name:'ANTÔNIO LOIOLA',role:'PERSONAGEM DA MEMÓRIA CULTURAL DE UAUÁ',image:'/guias/antonio-loiola.png'},
+  '/panoramas/correios.png':{name:'SENHOR ADEMAR',role:'ANFITRIÃO DE UM PONTO DE ENCONTRO CULTURAL',image:'/guias/senhor-ademar.png'},
+  '/panoramas/casa-roque.png':{name:'AUTO BARBOSA',role:'MÚSICO E AGITADOR CULTURAL UAUÁENSE',image:'/guias/auto-barbosa.png'},
+  '/panoramas/escola-joao-borges.png':{name:'MIKAL LÔBO',role:'POETISA E ESCRITORA DE UAUÁ',image:'/guias/mikal-lobo.png'},
+  '/panoramas/igreja-sao-joao.png':{name:'MESTRE CAVACHÃO',role:'CANTOR, COMPOSITOR E MEMORIALISTA',image:'/guias/mestre-cavachao.png'},
+  '/panoramas/praca-igreja.png':{name:'DEDÉ DO FOTO',role:'PERSONAGEM DA CULTURA SERTANEJA',image:'/guias/dede-do-foto.png'},
+  '/panoramas/prefeitura.png':{name:'VEINHO',role:'MÚSICA, HUMOR E MEMÓRIA ORAL DE UAUÁ',image:'/guias/veinho.png'}
 }
 let audioUnlocked=false
 let musicPaused=false
@@ -197,7 +197,7 @@ function enterPanorama(panorama){
   })
   scene.append(sky)
   const guide=monumentGuides[panorama]
-  if(guide){const host=make('a-entity',{id:'visit-guide',position:'-2.35 0 -5.4',animation:'property:rotation;from:0 -2 -1;to:0 2 1;dir:alternate;loop:true;dur:1100;easing:easeInOutSine'});host.append(make('a-image',{src:assetPath(guide.image),width:'1.72',height:'3.45',position:'0 1.72 0',material:'shader:flat;transparent:true;alphaTest:.03;side:double'}));host.append(make('a-plane',{width:'2.15',height:'.62',position:'0 -.14 .01',material:'shader:flat;color:#073F73;opacity:.94'}));host.append(canvasLabel(`GUIA DA MEMÓRIA\n${guide.name}`,{width:1.95,height:.48,position:'0 -.14 .03',color:'#FFFFFF',fontSize:48,align:'center',weight:'700'}));scene.append(host)}
+  if(guide){const host=make('a-entity',{id:'visit-guide',position:'-2.35 0 -5.4',animation:'property:rotation;from:0 -2 -1;to:0 2 1;dir:alternate;loop:true;dur:1100;easing:easeInOutSine'});host.append(make('a-image',{src:assetPath(guide.image),width:'1.72',height:'3.45',position:'0 1.72 0',material:'shader:flat;transparent:true;alphaTest:.03;side:double'}));host.append(make('a-plane',{width:'2.85',height:'.86',position:'0 -.22 .01',material:'shader:flat;color:#073F73;opacity:.96'}));host.append(canvasLabel(`${guide.name}\n${guide.role}`,{width:2.62,height:.68,position:'0 -.22 .03',color:'#FFFFFF',fontSize:43,align:'center',weight:'700'}));scene.append(host)}
   $('#camera').setAttribute('fov',sbsActive?'90':'82')
   $('#experience-exit').setAttribute('visible','true')
   document.body.classList.add('panorama-active')
