@@ -192,10 +192,21 @@ AFRAME.registerComponent('waving-guide',{
       this.body=work
       this.ctx.clearRect(0,0,this.canvas.width,this.canvas.height);this.ctx.drawImage(this.body,0,0)
       this.texture=new THREE.CanvasTexture(this.canvas);this.texture.colorSpace=THREE.SRGBColorSpace
-      const apply=()=>{const mesh=this.el.getObject3D('mesh');if(!mesh)return;mesh.material.map=this.texture;mesh.material.color.set('#fff');mesh.material.transparent=true;mesh.material.alphaTest=.025;mesh.material.side=THREE.DoubleSide;mesh.material.needsUpdate=true}
+      const apply=()=>{const mesh=this.el.getObject3D('mesh');if(!mesh)return;mesh.material.map=this.texture;mesh.material.color.set('#fff');mesh.material.transparent=true;mesh.material.alphaTest=.025;mesh.material.side=THREE.DoubleSide;mesh.material.needsUpdate=true;const position=mesh.geometry?.attributes?.position;if(position&&position.count>20){this.mesh=mesh;this.basePositions=new Float32Array(position.array)}}
       apply();this.el.addEventListener('object3dset',apply,{once:true});this.ready=true;this.texture.needsUpdate=true
     }
     this.image.src=this.data.src
+  },
+  tick(time){
+    if(!this.ready||!this.mesh||!this.basePositions)return
+    const position=this.mesh.geometry.attributes.position,phase=Math.sin(time*.0035)
+    for(let i=0;i<position.count;i++){
+      const offset=i*3,x=this.basePositions[offset],y=this.basePositions[offset+1]
+      const height=Math.max(0,Math.min(1,(y+.25)/2.35)),edge=.5+.5*Math.min(1,Math.abs(x)/1.05)
+      position.array[offset]=x+phase*.13*height*height*edge
+      position.array[offset+2]=this.basePositions[offset+2]+Math.abs(phase)*.018*height
+    }
+    position.needsUpdate=true
   },
   remove(){this.texture?.dispose()}
 })
@@ -229,7 +240,7 @@ function enterPanorama(panorama){
   })
   scene.append(sky)
   const guide=monumentGuides[panorama]
-  if(guide){const host=make('a-entity',{id:'visit-guide',position:'-4.8 -.86 -3.4',rotation:'0 55 0'});host.append(make('a-circle',{radius:'1.02',position:'0 .025 .08',rotation:'-90 0 0',scale:'1 .34 1',material:'shader:flat;color:#06182A;transparent:true;opacity:.34;side:double'}));const character=make('a-plane',{width:'2.1',height:'4.2',position:'0 2.1 0',material:'shader:flat;transparent:true;alphaTest:.025;side:double'});character.setAttribute('waving-guide',{src:assetPath(guide.image)});host.append(character);host.append(make('a-plane',{width:'3.65',height:'1.28',position:'-2.85 2.44 .01',material:'shader:flat;color:#073F73;opacity:.98'}));host.append(canvasLabel(guide.name,{width:3.36,height:.46,position:'-2.85 2.71 .03',color:'#FFFFFF',fontSize:82,align:'center',weight:'700'}));host.append(canvasLabel(guide.role,{width:3.3,height:.62,position:'-2.85 2.21 .03',color:'#FDBA18',fontSize:59,align:'center',weight:'700'}));scene.append(host)}
+  if(guide){const host=make('a-entity',{id:'visit-guide',position:'-4.8 -.86 -3.4',rotation:'0 55 0'});host.append(make('a-circle',{radius:'1.02',position:'0 .025 .08',rotation:'-90 0 0',scale:'1 .34 1',material:'shader:flat;color:#06182A;transparent:true;opacity:.34;side:double'}));const character=make('a-plane',{width:'2.1',height:'4.2','segments-width':'20','segments-height':'40',position:'0 2.1 0',material:'shader:flat;transparent:true;alphaTest:.025;side:double'});character.setAttribute('waving-guide',{src:assetPath(guide.image)});host.append(character);host.append(make('a-plane',{width:'3.65',height:'1.28',position:'-2.85 2.44 .01',material:'shader:flat;color:#073F73;opacity:.98'}));host.append(canvasLabel(guide.name,{width:3.36,height:.46,position:'-2.85 2.71 .03',color:'#FFFFFF',fontSize:82,align:'center',weight:'700'}));host.append(canvasLabel(guide.role,{width:3.3,height:.62,position:'-2.85 2.21 .03',color:'#FDBA18',fontSize:59,align:'center',weight:'700'}));scene.append(host)}
   $('#camera').setAttribute('fov',sbsActive?'90':'82')
   $('#experience-exit').setAttribute('visible','true')
   document.body.classList.add('panorama-active')
