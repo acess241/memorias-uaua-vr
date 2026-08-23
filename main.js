@@ -10,7 +10,8 @@ const sessions = [
       {title:'IGREJA SÃO JOÃO BATISTA',photos:['/monumentos/igreja-sao-joao-01.jpg','/monumentos/igreja-sao-joao-02.jpg'],panorama:'/panoramas/igreja-sao-joao.png',caption:'A construção da Igreja Matriz começou em 1921. A paróquia foi fundada em 1923.'},
       {title:'PRAÇA DA IGREJA',photos:['/monumentos/praca-igreja.jpg'],panorama:'/panoramas/praca-igreja.png',caption:'Registro das transformações da Praça São João Batista, no centro de Uauá.'},
       {title:'PRIMEIRA ESCOLA DE DATILOGRAFIA',photos:['/monumentos/escola-datilografia.jpg'],panorama:'/panoramas/escola-datilografia.png',caption:'Iniciativa do Padre Osvaldo, a escola foi inaugurada em 1976 e ofereceu formação profissional.'},
-      {title:'PREFEITURA MUNICIPAL DE UAUÁ',photos:['/monumentos/prefeitura.jpg'],panorama:'/panoramas/prefeitura.png',caption:'Sede administrativa de Uauá. O distrito foi criado em 1905; o município foi emancipado em 1926 e restaurado definitivamente em 1933.'}
+      {title:'PREFEITURA MUNICIPAL DE UAUÁ',photos:['/monumentos/prefeitura.jpg'],panorama:'/panoramas/prefeitura.png',caption:'Sede administrativa de Uauá. O distrito foi criado em 1905; o município foi emancipado em 1926 e restaurado definitivamente em 1933.'},
+      {title:'CÂMARA MUNICIPAL DE UAUÁ',photos:['/monumentos/camara-municipal.jpg'],panorama:'/panoramas/camara-municipal.png',caption:'Sede do Poder Legislativo municipal de Uauá. O edifício integra o conjunto urbano junto à Praça São João Batista e à Igreja Matriz, formando um espaço de vida pública, memória política e convivência da cidade.'}
     ],
     poem:{author:'GILDEMAR DE SENA',work:'Cordelizando o cordel',lines:'Literatura que vem da rima\nDe fácil compreensão\nQue falam de fatos já ocorridos\nE das façanhas de Lampião'}
   },
