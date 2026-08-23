@@ -187,8 +187,10 @@ function hideMuseumForExperience(root){
 function enterAlvorada(){
   if($('#alvorada-experience'))return
   sessionAudio.pause();const scene=$('a-scene'),root=make('a-entity',{id:'alvorada-experience'});hideMuseumForExperience(root)
-  root.append(make('a-sky',{src:assetPath('/alvorada/panorama-alvorada.png'),radius:'48',rotation:'0 -90 0',material:'shader:flat;side:back',animation:'property:rotation;from:0 -90 0;to:0 -86 0;dur:90000;easing:linear'}));scene.append(root)
-  const rig=$('#rig');rig.setAttribute('position','0 1.65 0');rig.setAttribute('animation__alvorada','property:position;from:0 1.62 0;to:0 1.69 0;dur:720;dir:alternate;loop:true;easing:easeInOutSine')
+  const stages=['trajeto-01-concentracao.png','trajeto-02-caminhada.png','trajeto-03-chegada.png']
+  const sky=make('a-sky',{id:'alvorada-sky',src:assetPath(`/alvorada/${stages[0]}`),radius:'48',rotation:'0 -90 0',material:'shader:flat;side:back'});root.append(sky);scene.append(root)
+  let stage=0;window.alvoradaRouteTimer=setInterval(()=>{stage=(stage+1)%stages.length;sky.setAttribute('src',assetPath(`/alvorada/${stages[stage]}`));sky.setAttribute('animation__passo',`property:rotation;from:0 ${-90+stage*.8} 0;to:0 ${-89.2+stage*.8} 0;dur:15000;easing:linear`)},15000)
+  const rig=$('#rig');rig.setAttribute('position','0 1.65 0');rig.setAttribute('animation__alvorada','property:position;from:-.035 1.61 0;to:.035 1.70 0;dur:690;dir:alternate;loop:true;easing:easeInOutSine')
   const audio=document.createElement('video');audio.id='alvorada-audio';audio.src=assetPath('/alvorada/registro-01.mp4');audio.playsInline=true;audio.loop=true;audio.style.display='none';document.body.append(audio);audio.play().catch(()=>{})
   $('#experience-exit').setAttribute('visible','true');document.body.classList.add('panorama-active')
 }
@@ -217,7 +219,7 @@ function exitPanorama(){
   document.body.classList.remove('panorama-active')
 }
 function exitAlvorada(){
-  $('#alvorada-audio')?.pause();$('#alvorada-audio')?.remove();$('#alvorada-experience')?.remove();const rig=$('#rig');rig.removeAttribute('animation__alvorada');rig.setAttribute('position','0 1.65 0');Array.from($('a-scene').children).forEach(element=>{if(element.dataset.visitVisibility!==undefined){element.setAttribute('visible',element.dataset.visitVisibility==='true');delete element.dataset.visitVisibility}});$('#camera').setAttribute('fov','72');$('#experience-exit').setAttribute('visible','false');document.body.classList.remove('panorama-active');loadSessionMusic()
+  clearInterval(window.alvoradaRouteTimer);window.alvoradaRouteTimer=null;$('#alvorada-audio')?.pause();$('#alvorada-audio')?.remove();$('#alvorada-experience')?.remove();const rig=$('#rig');rig.removeAttribute('animation__alvorada');rig.setAttribute('position','0 1.65 0');Array.from($('a-scene').children).forEach(element=>{if(element.dataset.visitVisibility!==undefined){element.setAttribute('visible',element.dataset.visitVisibility==='true');delete element.dataset.visitVisibility}});$('#camera').setAttribute('fov','72');$('#experience-exit').setAttribute('visible','false');document.body.classList.remove('panorama-active');loadSessionMusic()
 }
 async function exitExperience(){
   if($('#visit-panorama'))exitPanorama()
