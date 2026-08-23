@@ -74,21 +74,36 @@ const $=selector=>document.querySelector(selector)
 const assetPath=path=>`${import.meta.env.BASE_URL}${path.replace(/^\/+/, '')}`
 const sessionAudio=new Audio()
 const monumentGuides={
-  '/panoramas/belo-monte.png':{name:'ANTÔNIO LOIOLA',role:'PERSONAGEM DA MEMÓRIA CULTURAL DE UAUÁ',image:'/guias/antonio-loiola.png'},
-  '/panoramas/correios.png':{name:'SENHOR ADEMAR',role:'PROPRIETÁRIO DO BAR DO ADEMAR, PONTO DE ENCONTRO DE ARTISTAS DE UAUÁ',image:'/guias/senhor-ademar.png'},
-  '/panoramas/casa-roque.png':{name:'AUTO BARBOSA',role:'MÚSICO E AGITADOR CULTURAL UAUÁENSE',image:'/guias/auto-barbosa.png'},
-  '/panoramas/escola-joao-borges.png':{name:'MIKAL LÔBO',role:'POETISA E ESCRITORA DE UAUÁ',image:'/guias/mikal-lobo.png'},
-  '/panoramas/escola-senhor-bonfim.png':{name:'ZÉ DE AUTO',role:'MÚSICO, COMPOSITOR E MESTRE DO PÉ-DE-BODE',image:'/guias/ze-de-auto.png'},
-  '/panoramas/igreja-sao-joao.png':{name:'MESTRE CAVACHÃO',role:'CANTOR, COMPOSITOR E MEMORIALISTA',image:'/guias/mestre-cavachao.png'},
-  '/panoramas/praca-igreja.png':{name:'DEDÉ DO FOTO',role:'PERSONAGEM DA CULTURA SERTANEJA',image:'/guias/dede-do-foto.png'},
-  '/panoramas/escola-datilografia.png':{name:'MARIANE CARDOSO',role:'POETA DE UAUÁ',image:'/guias/mariane-cardoso.png'},
-  '/panoramas/prefeitura.png':{name:'VEINHO',role:'MÚSICA, HUMOR E MEMÓRIA ORAL DE UAUÁ',image:'/guias/veinho.png'},
-  '/panoramas/camara-municipal.png':{name:'CLÁUDIO BARRIS',role:'CANTOR, COMPOSITOR E POETA DE UAUÁ',image:'/guias/claudio-barris.png'}
+  '/panoramas/belo-monte.png':{name:'ANTÔNIO LOIOLA',role:'PERSONAGEM DA MEMÓRIA CULTURAL DE UAUÁ',image:'/guias/antonio-loiola.png',audio:'/narracoes/belo-monte.mp3'},
+  '/panoramas/correios.png':{name:'SENHOR ADEMAR',role:'PROPRIETÁRIO DO BAR DO ADEMAR, PONTO DE ENCONTRO DE ARTISTAS DE UAUÁ',image:'/guias/senhor-ademar.png',audio:'/narracoes/correios.mp3'},
+  '/panoramas/casa-roque.png':{name:'AUTO BARBOSA',role:'MÚSICO E AGITADOR CULTURAL UAUÁENSE',image:'/guias/auto-barbosa.png',audio:'/narracoes/casa-roque.mp3'},
+  '/panoramas/escola-joao-borges.png':{name:'MIKAL LÔBO',role:'POETISA E ESCRITORA DE UAUÁ',image:'/guias/mikal-lobo.png',audio:'/narracoes/escola-joao-borges.mp3'},
+  '/panoramas/escola-senhor-bonfim.png':{name:'ZÉ DE AUTO',role:'MÚSICO, COMPOSITOR E MESTRE DO PÉ-DE-BODE',image:'/guias/ze-de-auto.png',audio:'/narracoes/escola-senhor-bonfim.mp3'},
+  '/panoramas/igreja-sao-joao.png':{name:'MESTRE CAVACHÃO',role:'CANTOR, COMPOSITOR E MEMORIALISTA',image:'/guias/mestre-cavachao.png',audio:'/narracoes/igreja-sao-joao.mp3'},
+  '/panoramas/praca-igreja.png':{name:'DEDÉ DO FOTO',role:'PERSONAGEM DA CULTURA SERTANEJA',image:'/guias/dede-do-foto.png',audio:'/narracoes/praca-igreja.mp3'},
+  '/panoramas/escola-datilografia.png':{name:'MARIANE CARDOSO',role:'POETA DE UAUÁ',image:'/guias/mariane-cardoso.png',audio:'/narracoes/escola-datilografia.mp3'},
+  '/panoramas/prefeitura.png':{name:'VEINHO',role:'MÚSICA, HUMOR E MEMÓRIA ORAL DE UAUÁ',image:'/guias/veinho.png',audio:'/narracoes/prefeitura.mp3'},
+  '/panoramas/camara-municipal.png':{name:'CLÁUDIO BARRIS',role:'CANTOR, COMPOSITOR E POETA DE UAUÁ',image:'/guias/claudio-barris.png',audio:'/narracoes/camara-municipal.mp3'}
 }
 let audioUnlocked=false
 let musicPaused=false
+let guideNarration=null
+let narrationStartTimer=null
 sessionAudio.preload='auto'
 sessionAudio.volume=.55
+
+function stopGuideNarration(){
+  clearTimeout(narrationStartTimer)
+  if(guideNarration){guideNarration.pause();guideNarration.currentTime=0;guideNarration=null}
+  sessionAudio.volume=.55
+}
+
+function playGuideNarration(restart=true){
+  if(!guideNarration)return
+  if(restart)guideNarration.currentTime=0
+  sessionAudio.volume=.14
+  guideNarration.play().catch(()=>{sessionAudio.volume=.55})
+}
 
 function loadSessionMusic(shouldPlay=audioUnlocked&&!musicPaused){
   sessionAudio.pause()
@@ -240,13 +255,14 @@ function enterPanorama(panorama){
   })
   scene.append(sky)
   const guide=monumentGuides[panorama]
-  if(guide){const host=make('a-entity',{id:'visit-guide',position:'-4.8 -.86 -3.4',rotation:'0 55 0'});host.append(make('a-circle',{radius:'1.02',position:'0 .025 .08',rotation:'-90 0 0',scale:'1 .34 1',material:'shader:flat;color:#06182A;transparent:true;opacity:.34;side:double'}));const character=make('a-plane',{width:'2.1',height:'4.2','segments-width':'20','segments-height':'40',position:'0 2.1 0',material:'shader:flat;transparent:true;alphaTest:.025;side:double'});character.setAttribute('waving-guide',{src:assetPath(guide.image)});host.append(character);host.append(make('a-plane',{width:'3.65',height:'1.28',position:'-2.85 2.44 .01',material:'shader:flat;color:#073F73;opacity:.98'}));host.append(canvasLabel(guide.name,{width:3.36,height:.46,position:'-2.85 2.71 .03',color:'#FFFFFF',fontSize:82,align:'center',weight:'700'}));host.append(canvasLabel(guide.role,{width:3.3,height:.62,position:'-2.85 2.21 .03',color:'#FDBA18',fontSize:59,align:'center',weight:'700'}));scene.append(host)}
+  if(guide){const host=make('a-entity',{id:'visit-guide',position:'-4.8 -.86 -3.4',rotation:'0 55 0'});host.append(make('a-circle',{radius:'1.02',position:'0 .025 .08',rotation:'-90 0 0',scale:'1 .34 1',material:'shader:flat;color:#06182A;transparent:true;opacity:.34;side:double'}));const character=make('a-plane',{width:'2.1',height:'4.2','segments-width':'20','segments-height':'40',position:'0 2.1 0',material:'shader:flat;transparent:true;alphaTest:.025;side:double'});character.setAttribute('waving-guide',{src:assetPath(guide.image)});host.append(character);host.append(make('a-plane',{width:'3.65',height:'1.28',position:'-2.85 2.44 .01',material:'shader:flat;color:#073F73;opacity:.98'}));host.append(canvasLabel(guide.name,{width:3.36,height:.46,position:'-2.85 2.71 .03',color:'#FFFFFF',fontSize:82,align:'center',weight:'700'}));host.append(canvasLabel(guide.role,{width:3.3,height:.62,position:'-2.85 2.21 .03',color:'#FDBA18',fontSize:59,align:'center',weight:'700'}));const repeat=make('a-plane',{class:'interactive gaze-target',width:'2.7',height:'.62',position:'-2.85 1.48 .02',material:'shader:flat;color:#0867C7;opacity:.98'});host.append(repeat);host.append(canvasLabel('OUVIR NOVAMENTE',{width:2.45,height:.42,position:'-2.85 1.48 .04',color:'#FFFFFF',fontSize:65,align:'center',weight:'700'}));scene.append(host);guideNarration=new Audio(assetPath(guide.audio));guideNarration.preload='auto';guideNarration.addEventListener('ended',()=>{sessionAudio.volume=.55});bindGaze(repeat,()=>playGuideNarration(true));narrationStartTimer=setTimeout(()=>playGuideNarration(true),900)}
   $('#camera').setAttribute('fov',sbsActive?'90':'82')
   $('#experience-exit').setAttribute('visible','true')
   document.body.classList.add('panorama-active')
 }
 function exitPanorama(){
   window.gazeLockedUntil=Date.now()+2600
+  stopGuideNarration()
   $('#visit-panorama')?.remove()
   $('#visit-guide')?.remove()
   const scene=$('a-scene'),rig=$('#rig')
