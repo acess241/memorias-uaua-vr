@@ -187,7 +187,6 @@ AFRAME.registerComponent('waving-guide',{
       this.body=work
       this.arm=document.createElement('canvas');this.arm.width=310;this.arm.height=650
       this.arm.getContext('2d').drawImage(work,0,0,310,650,0,0,310,650)
-      context.clearRect(0,0,310,650)
       this.texture=new THREE.CanvasTexture(this.canvas);this.texture.colorSpace=THREE.SRGBColorSpace
       const apply=()=>{const mesh=this.el.getObject3D('mesh');if(!mesh)return;mesh.material.map=this.texture;mesh.material.color.set('#fff');mesh.material.transparent=true;mesh.material.alphaTest=.025;mesh.material.side=THREE.DoubleSide;mesh.material.needsUpdate=true}
       apply();this.el.addEventListener('object3dset',apply,{once:true});this.ready=true
@@ -234,7 +233,7 @@ function enterPanorama(panorama){
   })
   scene.append(sky)
   const guide=monumentGuides[panorama]
-  if(guide){const host=make('a-entity',{id:'visit-guide',position:'-2.35 0 -5.4'});const character=make('a-plane',{width:'1.72',height:'3.45',position:'0 1.72 0',material:'shader:flat;transparent:true;alphaTest:.025;side:double'});character.setAttribute('waving-guide',{src:assetPath(guide.image)});host.append(character);host.append(make('a-plane',{width:'3.8',height:'1.28',position:'2.65 1.32 .01',material:'shader:flat;color:#073F73;opacity:.98'}));host.append(canvasLabel(guide.name,{width:3.48,height:.46,position:'2.65 1.57 .03',color:'#FFFFFF',fontSize:82,align:'center',weight:'700'}));host.append(canvasLabel(guide.role,{width:3.42,height:.62,position:'2.65 1.08 .03',color:'#FDBA18',fontSize:59,align:'center',weight:'700'}));scene.append(host)}
+  if(guide){const host=make('a-entity',{id:'visit-guide',position:'-3.55 0 -5.9'});const character=make('a-plane',{width:'2.28',height:'4.56',position:'0 2.28 0',material:'shader:flat;transparent:true;alphaTest:.025;side:double'});character.setAttribute('waving-guide',{src:assetPath(guide.image)});host.append(character);host.append(make('a-plane',{width:'4.05',height:'1.32',position:'3.35 1.62 .01',material:'shader:flat;color:#073F73;opacity:.98'}));host.append(canvasLabel(guide.name,{width:3.72,height:.48,position:'3.35 1.9 .03',color:'#FFFFFF',fontSize:84,align:'center',weight:'700'}));host.append(canvasLabel(guide.role,{width:3.66,height:.64,position:'3.35 1.38 .03',color:'#FDBA18',fontSize:60,align:'center',weight:'700'}));scene.append(host)}
   $('#camera').setAttribute('fov',sbsActive?'90':'82')
   $('#experience-exit').setAttribute('visible','true')
   document.body.classList.add('panorama-active')
