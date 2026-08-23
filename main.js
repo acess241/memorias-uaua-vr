@@ -53,27 +53,18 @@ const sessions = [
   {
     title:'PAISAGENS E MEMÓRIAS',
     items:[
-      {title:'PEDRA RISCADA',photos:['/paisagens/pedra-riscada.jpg'],caption:'Sítio de arte rupestre de Uauá, reconhecido como patrimônio arqueológico brasileiro e preservado como testemunho de ocupações humanas antigas no sertão.'},
-      {title:'GRUTA DO JERÔNIMO',photos:['/paisagens/gruta-jeronimo.jpg'],caption:'Formação natural do território de Uauá. A gruta integra a paisagem rochosa e a memória das comunidades que conhecem e percorrem a região.'},
+      {title:'PEDRA RISCADA',photos:['/paisagens/pedra-riscada.jpg'],panorama:'/panoramas/pedra-riscada.png',caption:'Sítio de arte rupestre de Uauá, reconhecido como patrimônio arqueológico brasileiro e preservado como testemunho de ocupações humanas antigas no sertão.'},
+      {title:'GRUTA DO JERÔNIMO',photos:['/paisagens/gruta-jeronimo.jpg'],panorama:'/panoramas/gruta-jeronimo.png',caption:'Formação natural do território de Uauá. A gruta integra a paisagem rochosa e a memória das comunidades que conhecem e percorrem a região.'},
       {title:'JOSÉ BORGES RIBEIRO',photos:['/paisagens/jose-borges-ribeiro.jpg'],caption:'José Borges Ribeiro nasceu em 1º de junho de 1941 e faleceu em 26 de março de 2012. Seu retrato integra a memória familiar e comunitária de Uauá.'},
       {title:'JOSÉ RAMOS DA SILVA',photos:['/paisagens/jose-ramos-01.jpg','/paisagens/jose-ramos-02.jpg'],caption:'José Ramos da Silva foi delegado e sargento de polícia em Uauá durante o período do cangaço. Segundo o registro histórico, foi contratado para combater cangaceiros na Bahia.'},
-      {title:'PEDRA DO ÍNDIO',photos:['/paisagens/pedra-do-indio.jpg'],caption:'Monumento natural formado pelo equilíbrio de grandes blocos de pedra, cercado pela vegetação da Caatinga e associado à identidade visual do território uauaense.'},
-      {title:'PEDRA DO SAL',photos:['/paisagens/pedra-do-sal.jpg'],caption:'Lugar relacionado às narrativas sobre a passagem de Lampião pela região. A tradição local registra que o ponto foi utilizado como posição de trincheira.'},
-      {title:'UAUÁ COUNTRY CLUB',photos:['/paisagens/uaua-country-club.jpg'],caption:'Antiga residência de Constantino Tolentino de Souza e Salomé Dias Ribeiro. Depois, o imóvel tornou-se sede do Uauá Country Club, também conhecido como Clube de Anita.'},
-      {title:'SERRA DO SOBRADO — TRIBUTO',photos:['/paisagens/serra-do-sobrado.jpg'],caption:'Paisagem conhecida como Tributo, na Serra do Sobrado. Rochas, água e vegetação da Caatinga compõem um lugar de referência ambiental e afetiva.'}
+      {title:'PEDRA DO ÍNDIO',photos:['/paisagens/pedra-do-indio.jpg'],panorama:'/panoramas/pedra-do-indio.png',caption:'Monumento natural formado pelo equilíbrio de grandes blocos de pedra, cercado pela vegetação da Caatinga e associado à identidade visual do território uauaense.'},
+      {title:'PEDRA DO SAL',photos:['/paisagens/pedra-do-sal.jpg'],panorama:'/panoramas/pedra-do-sal.png',caption:'Lugar relacionado às narrativas sobre a passagem de Lampião pela região. A tradição local registra que o ponto foi utilizado como posição de trincheira.'},
+      {title:'UAUÁ COUNTRY CLUB',photos:['/paisagens/uaua-country-club.jpg'],panorama:'/panoramas/uaua-country-club.png',caption:'Antiga residência de Constantino Tolentino de Souza e Salomé Dias Ribeiro. Depois, o imóvel tornou-se sede do Uauá Country Club, também conhecido como Clube de Anita.'},
+      {title:'SERRA DO SOBRADO — TRIBUTO',photos:['/paisagens/serra-do-sobrado.jpg'],panorama:'/panoramas/serra-do-sobrado.png',caption:'Paisagem conhecida como Tributo, na Serra do Sobrado. Rochas, água e vegetação da Caatinga compõem um lugar de referência ambiental e afetiva.'}
     ],
     poem:{author:'MARIANE DOS SANTOS CARDOSO',work:'Sou o sertão',lines:'Sou o xique-xique\nSou o mandacaru\nSou o facheiro\nSou o umbuzeiro de onde sai o umbu\n\nSou o chapéu de couro\nSou a perneira e o gibão\nSou o vaqueiro valente\nSou que desbrava nesse sertão'}
   }
 ]
-
-// A coleção passa a ser uma jornada narrativa, e não uma sequência numérica.
-const [history,people,faith,today,earth]=sessions
-earth.title='TERRA — PAISAGENS E ORIGENS'
-history.title='HISTÓRIA — PATRIMÔNIO E FORMAÇÃO'
-faith.title='FÉ E TRADIÇÃO — SONS E EXPRESSÕES'
-people.title='PESSOAS — MESTRES E MEMÓRIAS'
-today.title='UAUÁ DE HOJE — FESTAS E VIDA PÚBLICA'
-sessions.splice(0,sessions.length,earth,history,faith,people,today)
 
 let currentSession=0
 let leaveSBS=async()=>{}
@@ -201,6 +192,7 @@ function enterPanorama(panorama){
   document.body.classList.add('panorama-active')
 }
 function exitPanorama(){
+  window.gazeLockedUntil=Date.now()+2600
   $('#visit-panorama')?.remove()
   const scene=$('a-scene'),rig=$('#rig')
   Array.from(scene.children).forEach(element=>{
@@ -247,7 +239,7 @@ function showFinale(){sessionAudio.pause();document.body.classList.add('journey-
 function restartJourney(){currentSession=0;$('#museum-finale')?.classList.remove('show');document.body.classList.remove('journey-complete');renderSession()}
 function nextSession(){if(currentSession===sessions.length-1){showFinale();return}currentSession++;renderSession()}
 function previousSession(){currentSession=(currentSession-1+sessions.length)%sessions.length;renderSession()}
-function bindGaze(target,action){let timer=null,cooldown=false;target.addEventListener('mouseenter',()=>{if(cooldown)return;target.setAttribute('animation__gaze','property:scale;from:1 1 1;to:1.18 1.18 1.18;dur:1600;easing:linear');timer=setTimeout(()=>{cooldown=true;action();target.setAttribute('animation__gaze','property:scale;to:1 1 1;dur:220');setTimeout(()=>cooldown=false,1200)},1600)});target.addEventListener('mouseleave',()=>{clearTimeout(timer);target.removeAttribute('animation__gaze');target.setAttribute('scale','1 1 1')})}
+function bindGaze(target,action){let timer=null,cooldown=false;target.addEventListener('mouseenter',()=>{if(cooldown||Date.now()<(window.gazeLockedUntil||0))return;target.setAttribute('animation__gaze','property:scale;from:1 1 1;to:1.18 1.18 1.18;dur:1600;easing:linear');timer=setTimeout(()=>{if(Date.now()<(window.gazeLockedUntil||0))return;cooldown=true;action();target.setAttribute('animation__gaze','property:scale;to:1 1 1;dur:220');setTimeout(()=>cooldown=false,1200)},1600)});target.addEventListener('mouseleave',()=>{clearTimeout(timer);target.removeAttribute('animation__gaze');target.setAttribute('scale','1 1 1')})}
 
 function createColumns(){const columns=$('#columns');for(let i=0;i<12;i++){const angle=i*30,r=angle*Math.PI/180,e=make('a-entity',{position:`${Math.sin(r)*9.45} 0 ${Math.cos(r)*9.45}`});e.innerHTML='<a-cylinder radius=".18" height="5.65" position="0 2.85 0" material="color:#0B67C8;roughness:.88" segments-radial="12"></a-cylinder><a-cylinder radius=".34" height=".14" position="0 .07 0" material="color:#FDBA18"></a-cylinder>';columns.append(e)}}
 function createMemoryFireflies(){const scene=$('a-scene');for(let i=0;i<16;i++){const angle=i/16*Math.PI*2,radius=3.2+(i%4)*1.25,x=Math.sin(angle)*radius,z=Math.cos(angle)*radius,y=1.2+(i%5)*.72;scene.append(make('a-sphere',{class:'memory-firefly',radius:'.035',position:`${x} ${y} ${z}`,material:'shader:flat;color:#FFF38A;emissive:#FDBA18;emissiveIntensity:2',animation:`property:position;dir:alternate;loop:true;dur:${1700+i*93};easing:easeInOutSine;to:${x+.18} ${y+.3} ${z-.12}`}))}}
