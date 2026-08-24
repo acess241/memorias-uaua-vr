@@ -375,7 +375,7 @@ function renderSession(){
   const room=$('#monuments-room'),session=sessions[currentSession],showPoem=currentSession!==0,total=session.items.length+(showPoem?1:0)
   while(room.firstChild)room.removeChild(room.firstChild)
   session.items.forEach((item,index)=>room.append(createPhotoPanel(item,index,total,session.title)));if(showPoem)room.append(createPoemPanel(session.poem,total-1,total,session.title))
-  $('.identity b').textContent=`MUSEU PÁTRIA DOS VAGALUMES · ${session.title}`
+  $('.identity b').textContent=`MEMORIAL CENTENÁRIO DE UAUÁ · ${session.title}`
   room.setAttribute('animation__enter','property:scale;from:.75 .75 .75;to:1 1 1;dur:650;easing:easeOutBack')
   loadSessionMusic()
 }
