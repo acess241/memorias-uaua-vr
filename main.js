@@ -187,7 +187,7 @@ function installSBS(scene){
 }
 AFRAME.registerComponent('museum-explorer',{
   init(){
-    this.keys=new Set();this.stick={x:0,y:0};this.speed=4.1
+    this.keys=new Set();this.stick={x:0,y:0};this.speed=4.1;this.gamepadTogglePressed=false
     this.keyDown=event=>{if(['KeyW','KeyA','KeyS','KeyD','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(event.code)){this.keys.add(event.code);if(exploreActive)event.preventDefault()}}
     this.keyUp=event=>this.keys.delete(event.code)
     window.addEventListener('keydown',this.keyDown);window.addEventListener('keyup',this.keyUp)
@@ -204,8 +204,14 @@ AFRAME.registerComponent('museum-explorer',{
     base.addEventListener('touchstart',move,{passive:false});base.addEventListener('touchmove',move,{passive:false});base.addEventListener('touchend',stop)
   },
   tick(time,delta){
+    const gamepad=Array.from(navigator.getGamepads?.()||[]).find(Boolean)
+    const togglePressed=Boolean(gamepad?.buttons?.[0]?.pressed||gamepad?.buttons?.[9]?.pressed)
+    if(togglePressed&&!this.gamepadTogglePressed&&!sbsActive){unlockSessionMusic();setExploreMode(!exploreActive)}
+    this.gamepadTogglePressed=togglePressed
     if(!exploreActive||sbsActive||$('#visit-panorama'))return
     let x=this.stick.x,y=-this.stick.y
+    const deadzone=value=>Math.abs(value||0)>.16?value:0
+    if(gamepad){x+=deadzone(gamepad.axes?.[0]);y-=deadzone(gamepad.axes?.[1]);const lookX=deadzone(gamepad.axes?.[2]),lookY=deadzone(gamepad.axes?.[3]);const controls=$('#camera')?.components?.['look-controls'];if(controls?.yawObject&&controls?.pitchObject){controls.yawObject.rotation.y-=lookX*delta*.0022;controls.pitchObject.rotation.x=Math.max(-Math.PI/2,Math.min(Math.PI/2,controls.pitchObject.rotation.x-lookY*delta*.0018))}}
     if(this.keys.has('KeyW')||this.keys.has('ArrowUp'))y+=1
     if(this.keys.has('KeyS')||this.keys.has('ArrowDown'))y-=1
     if(this.keys.has('KeyD')||this.keys.has('ArrowRight'))x+=1
