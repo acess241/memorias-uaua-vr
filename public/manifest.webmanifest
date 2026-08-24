@@ -1,11 +1,11 @@
 {
-  "name": "Museu Pátria dos Vagalumes",
-  "short_name": "Pátria dos Vagalumes",
+  "name": "Memorial Centenário de Uauá",
+  "short_name": "Memorial de Uauá",
   "start_url": "./",
   "scope": "./",
   "display": "fullscreen",
   "orientation": "landscape",
   "background_color": "#052f57",
   "theme_color": "#073f73",
-  "description": "Museu imersivo sobre o patrimônio, a cultura e a memória de Uauá."
+  "description": "Memorial imersivo sobre o patrimônio, a cultura e a memória de Uauá."
 }
