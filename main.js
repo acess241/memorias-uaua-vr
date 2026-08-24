@@ -206,13 +206,18 @@ AFRAME.registerComponent('museum-explorer',{
   },
   tick(time,delta){
     const gamepad=Array.from(navigator.getGamepads?.()||[]).find(Boolean)
+    const deadzone=value=>Math.abs(value||0)>.16?value:0
     const togglePressed=Boolean(gamepad?.buttons?.[0]?.pressed||gamepad?.buttons?.[9]?.pressed)
     if(togglePressed&&!this.gamepadTogglePressed&&!sbsActive){unlockSessionMusic();setExploreMode(!exploreActive)}
     this.gamepadTogglePressed=togglePressed
+    if(gamepad&&!sbsActive){
+      const lookX=deadzone(gamepad.axes?.[2]),lookY=deadzone(gamepad.axes?.[3]),cameraElement=$('#camera'),controls=cameraElement?.components?.['look-controls']
+      if(controls?.yawObject&&controls?.pitchObject){controls.yawObject.rotation.y-=lookX*delta*.0022;controls.pitchObject.rotation.x=Math.max(-Math.PI/2,Math.min(Math.PI/2,controls.pitchObject.rotation.x-lookY*delta*.0018))}
+      else if(cameraElement?.object3D){cameraElement.object3D.rotation.y-=lookX*delta*.0022;cameraElement.object3D.rotation.x=Math.max(-Math.PI/2,Math.min(Math.PI/2,cameraElement.object3D.rotation.x-lookY*delta*.0018))}
+    }
     if(!exploreActive||sbsActive)return
     let x=this.stick.x,y=-this.stick.y
-    const deadzone=value=>Math.abs(value||0)>.16?value:0
-    if(gamepad){x+=deadzone(gamepad.axes?.[0]);y-=deadzone(gamepad.axes?.[1]);const lookX=deadzone(gamepad.axes?.[2]),lookY=deadzone(gamepad.axes?.[3]);const controls=$('#camera')?.components?.['look-controls'];if(controls?.yawObject&&controls?.pitchObject){controls.yawObject.rotation.y-=lookX*delta*.0022;controls.pitchObject.rotation.x=Math.max(-Math.PI/2,Math.min(Math.PI/2,controls.pitchObject.rotation.x-lookY*delta*.0018))}}
+    if(gamepad){x+=deadzone(gamepad.axes?.[0]);y-=deadzone(gamepad.axes?.[1])}
     if(this.keys.has('KeyW')||this.keys.has('ArrowUp'))y+=1
     if(this.keys.has('KeyS')||this.keys.has('ArrowDown'))y-=1
     if(this.keys.has('KeyD')||this.keys.has('ArrowRight'))x+=1
