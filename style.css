@@ -16,6 +16,12 @@ a-scene canvas{display:block!important;width:100%!important;height:100%!importan
 .hud-actions{display:flex;gap:9px;pointer-events:auto}
 .hud button{pointer-events:auto;border:2px solid #fdbb18;border-radius:30px;min-height:50px;padding:13px 22px;background:#073f73f2;color:#fff;font:800 14px 'Montserrat';letter-spacing:1.2px;cursor:pointer;backdrop-filter:blur(8px)}
 #enter-vr{background:#0b67c8e8;border-color:#fdba18}
+#enter-explore.active{background:#fdbb18;color:#052f57;border-color:#fff}
+#mobile-stick{display:none;position:fixed;z-index:15;left:max(22px,env(safe-area-inset-left));bottom:max(24px,env(safe-area-inset-bottom));width:118px;height:118px;border:2px solid #fdbb1899;border-radius:50%;background:#052f5799;box-shadow:0 8px 28px #001b3a88;touch-action:none;user-select:none;backdrop-filter:blur(5px)}
+#mobile-stick span{position:absolute;left:50%;top:50%;width:48px;height:48px;margin:-24px;border-radius:50%;background:#0b67c8;border:2px solid #fdbb18;box-shadow:0 4px 14px #001a36}
+#mobile-stick small{position:absolute;left:0;right:0;bottom:-20px;text-align:center;color:#fdbb18;font:800 9px 'Montserrat';letter-spacing:1.5px}
+body.explore-active #mobile-stick{display:block}
+body.explore-active .orientation span:after{content:' · WASD OU JOYSTICK PARA CAMINHAR'}
 .orientation{position:fixed;z-index:5;bottom:max(25px,env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:12px;color:#fdba18;font-size:8px;letter-spacing:1.8px;pointer-events:none;text-shadow:0 2px 5px #002a50}
 .orientation i{display:block;width:28px;height:20px;border:1px solid #fdba18;border-radius:12px;position:relative}
 .orientation i:after{content:'';position:absolute;width:2px;height:6px;left:12px;top:3px;background:#fdba18;animation:look 1.8s ease-in-out infinite}
@@ -46,7 +52,7 @@ body.pseudo-fullscreen .hud{padding-top:max(10px,env(safe-area-inset-top))}
   .identity b{font-size:8px;letter-spacing:1px}
   .identity small{display:none}
   .identity>img{width:120px;height:52px}
-  .hud-actions{position:fixed;z-index:12;left:max(12px,env(safe-area-inset-left));right:max(12px,env(safe-area-inset-right));bottom:max(14px,env(safe-area-inset-bottom));display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .hud-actions{position:fixed;z-index:12;left:max(12px,env(safe-area-inset-left));right:max(12px,env(safe-area-inset-right));bottom:max(14px,env(safe-area-inset-bottom));display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
   .hud button{min-height:58px;padding:13px 10px;font-size:15px;font-weight:800;letter-spacing:.7px;background:#073f73f2;box-shadow:0 8px 28px #001b3a88}
   #enter-vr{background:#0b67c8f2}
   .orientation{bottom:max(82px,calc(env(safe-area-inset-bottom) + 82px));width:100%;justify-content:center}
@@ -56,4 +62,9 @@ body.pseudo-fullscreen .hud{padding-top:max(10px,env(safe-area-inset-top))}
   .sbs-active .hud-actions{display:block;left:auto;right:max(12px,env(safe-area-inset-right));width:min(250px,44vw)}
   .sbs-active #enter-vr{width:100%}
   .sbs-active #enter-fullscreen{display:none}
+  .sbs-active #enter-explore{display:none}
+  body.explore-active .hud-actions{left:155px}
+  body.explore-active .orientation{display:none}
 }
+
+@media(pointer:fine){body.explore-active #mobile-stick{display:none}}

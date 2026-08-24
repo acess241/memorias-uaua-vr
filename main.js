@@ -87,10 +87,21 @@ const monumentGuides={
 }
 let audioUnlocked=false
 let musicPaused=false
+let exploreActive=false
 let guideNarration=null
 let narrationStartTimer=null
 sessionAudio.preload='auto'
 sessionAudio.volume=.55
+
+function setExploreMode(enabled){
+  exploreActive=Boolean(enabled)&&!sbsActive
+  document.body.classList.toggle('explore-active',exploreActive)
+  const button=$('#enter-explore')
+  if(button){
+    button.classList.toggle('active',exploreActive)
+    button.textContent=exploreActive?'PARAR EXPLORAÇÃO':'EXPLORAR'
+  }
+}
 
 function stopGuideNarration(){
   clearTimeout(narrationStartTimer)
@@ -167,13 +178,50 @@ function installSBS(scene){
   async function requestMotion(){if(typeof DeviceOrientationEvent!=='undefined'&&typeof DeviceOrientationEvent.requestPermission==='function')try{await DeviceOrientationEvent.requestPermission()}catch{}}
   async function enterFullscreen(){document.body.classList.add('pseudo-fullscreen');const request=document.documentElement.requestFullscreen||document.documentElement.webkitRequestFullscreen;try{if(request)await request.call(document.documentElement,{navigationUI:'hide'})}catch{};try{await screen.orientation?.lock?.('landscape')}catch{};const active=Boolean(fullscreenElement());$('#enter-fullscreen').textContent=active?'SAIR DA TELA CHEIA':'MODO AMPLO';return active}
   async function leaveFullscreen(){document.body.classList.remove('pseudo-fullscreen');const exit=document.exitFullscreen||document.webkitExitFullscreen;try{if(fullscreenElement()&&exit)await exit.call(document)}catch{};try{screen.orientation?.unlock?.()}catch{};$('#enter-fullscreen').textContent='TELA CHEIA'}
-  async function activate(){unlockSessionMusic();enabled=true;sbsActive=true;$('#camera').setAttribute('fov','90');updateVRSize();setOverlay(false);document.body.classList.add('sbs-active');$('#experience-exit').setAttribute('visible','false');await Promise.allSettled([requestMotion(),enterFullscreen()]);scheduleResize()}
+  async function activate(){unlockSessionMusic();setExploreMode(false);enabled=true;sbsActive=true;$('#camera').setAttribute('fov','90');updateVRSize();setOverlay(false);document.body.classList.add('sbs-active');$('#experience-exit').setAttribute('visible','false');await Promise.allSettled([requestMotion(),enterFullscreen()]);scheduleResize()}
   async function deactivate(){if(!enabled)return;enabled=false;sbsActive=false;$('#camera').setAttribute('fov','72');updateVRSize();document.body.classList.remove('sbs-active');setOverlay(true);$('#experience-exit').setAttribute('visible','false');await leaveFullscreen();scheduleResize()}
   leaveSBS=deactivate
   $('#enter-vr').addEventListener('click',()=>{unlockSessionMusic();enabled?deactivate():activate()})
   $('#enter-fullscreen').addEventListener('click',async()=>{unlockSessionMusic();if(fullscreenElement()||document.body.classList.contains('pseudo-fullscreen'))await leaveFullscreen();else await enterFullscreen()})
   ;['fullscreenchange','webkitfullscreenchange'].forEach(name=>document.addEventListener(name,()=>{$('#enter-fullscreen').textContent=fullscreenElement()||document.body.classList.contains('pseudo-fullscreen')?'SAIR DA TELA CHEIA':'TELA CHEIA';scheduleResize()}))
 }
+AFRAME.registerComponent('museum-explorer',{
+  init(){
+    this.keys=new Set();this.stick={x:0,y:0};this.speed=2.65
+    this.keyDown=event=>{if(['KeyW','KeyA','KeyS','KeyD','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(event.code)){this.keys.add(event.code);if(exploreActive)event.preventDefault()}}
+    this.keyUp=event=>this.keys.delete(event.code)
+    window.addEventListener('keydown',this.keyDown);window.addEventListener('keyup',this.keyUp)
+    setTimeout(()=>this.bindStick(),0)
+  },
+  bindStick(){
+    const base=$('#mobile-stick');if(!base)return
+    const knob=base.querySelector('span')
+    const move=event=>{const point=event.touches?.[0]||event,rect=base.getBoundingClientRect(),radius=rect.width*.34;let x=point.clientX-(rect.left+rect.width/2),y=point.clientY-(rect.top+rect.height/2),length=Math.hypot(x,y);if(length>radius){x=x/length*radius;y=y/length*radius}this.stick={x:x/radius,y:y/radius};knob.style.transform=`translate(${x}px,${y}px)`}
+    const stop=()=>{this.stick={x:0,y:0};knob.style.transform='translate(0,0)'}
+    base.addEventListener('pointerdown',event=>{base.setPointerCapture?.(event.pointerId);move(event)})
+    base.addEventListener('pointermove',event=>{if(event.buttons||event.pressure>0)move(event)})
+    base.addEventListener('pointerup',stop);base.addEventListener('pointercancel',stop)
+    base.addEventListener('touchstart',move,{passive:false});base.addEventListener('touchmove',move,{passive:false});base.addEventListener('touchend',stop)
+  },
+  tick(time,delta){
+    if(!exploreActive||sbsActive||$('#visit-panorama'))return
+    let x=this.stick.x,y=-this.stick.y
+    if(this.keys.has('KeyW')||this.keys.has('ArrowUp'))y+=1
+    if(this.keys.has('KeyS')||this.keys.has('ArrowDown'))y-=1
+    if(this.keys.has('KeyD')||this.keys.has('ArrowRight'))x+=1
+    if(this.keys.has('KeyA')||this.keys.has('ArrowLeft'))x-=1
+    if(Math.abs(x)+Math.abs(y)<.05)return
+    const camera=$('#camera')?.getObject3D('camera');if(!camera)return
+    const forward=new THREE.Vector3(0,0,-1).applyQuaternion(camera.quaternion);forward.y=0;forward.normalize()
+    const right=new THREE.Vector3(1,0,0).applyQuaternion(camera.quaternion);right.y=0;right.normalize()
+    const direction=forward.multiplyScalar(y).add(right.multiplyScalar(x));if(direction.lengthSq()>1)direction.normalize()
+    const position=this.el.object3D.position.clone().addScaledVector(direction,this.speed*Math.min(delta,.05)/1000)
+    const horizontal=new THREE.Vector2(position.x,position.z);if(horizontal.length()>6.25){horizontal.setLength(6.25);position.x=horizontal.x;position.z=horizontal.y}
+    position.y=1.65;this.el.object3D.position.copy(position)
+  },
+  remove(){window.removeEventListener('keydown',this.keyDown);window.removeEventListener('keyup',this.keyUp)}
+})
+
 AFRAME.registerComponent('canvas-label',{
   schema:{text:{default:''},color:{default:'#073F73'},fontSize:{type:'int',default:58},align:{default:'left'},weight:{default:'600'}},
   update(){
@@ -330,4 +378,4 @@ function createExperienceExit(){
   control.append(target);control.append(canvasLabel('SAIR DA EXPERIÊNCIA',{width:'2.95',height:'.58',position:'0 0 .03',color:'#FFFFFF',fontSize:82,align:'center',weight:'700'}));$('a-scene').append(control);bindGaze(target,exitExperience)
 }
 
-window.addEventListener('DOMContentLoaded',()=>{createColumns();createMemoryFireflies();createCeilingLabels();createExperienceExit();renderSession();$('#restart-journey')?.addEventListener('click',restartJourney);document.addEventListener('pointerdown',unlockSessionMusic,{once:true});bindGaze($('#previous-session-target'),previousSession);bindGaze($('#music-toggle-target'),toggleSessionMusic);bindGaze($('#next-session-target'),nextSession);const scene=$('a-scene');const initializeScene=()=>{if(scene.dataset.sbsReady||!scene.renderer)return;scene.dataset.sbsReady='true';installSBS(scene);setTimeout(()=>$('#loading').classList.add('hide'),450)};if(scene.hasLoaded)initializeScene();else scene.addEventListener('loaded',initializeScene,{once:true})})
+window.addEventListener('DOMContentLoaded',()=>{createColumns();createMemoryFireflies();createCeilingLabels();createExperienceExit();renderSession();$('#restart-journey')?.addEventListener('click',restartJourney);$('#enter-explore')?.addEventListener('click',()=>{unlockSessionMusic();setExploreMode(!exploreActive)});document.addEventListener('pointerdown',unlockSessionMusic,{once:true});bindGaze($('#previous-session-target'),previousSession);bindGaze($('#music-toggle-target'),toggleSessionMusic);bindGaze($('#next-session-target'),nextSession);const scene=$('a-scene');const initializeScene=()=>{if(scene.dataset.sbsReady||!scene.renderer)return;scene.dataset.sbsReady='true';installSBS(scene);setTimeout(()=>$('#loading').classList.add('hide'),450)};if(scene.hasLoaded)initializeScene();else scene.addEventListener('loaded',initializeScene,{once:true})})
