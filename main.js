@@ -90,6 +90,7 @@ let musicPaused=false
 let exploreActive=false
 let guideNarration=null
 let narrationStartTimer=null
+let experienceReturnPosition=null
 sessionAudio.preload='auto'
 sessionAudio.volume=.55
 
@@ -208,7 +209,7 @@ AFRAME.registerComponent('museum-explorer',{
     const togglePressed=Boolean(gamepad?.buttons?.[0]?.pressed||gamepad?.buttons?.[9]?.pressed)
     if(togglePressed&&!this.gamepadTogglePressed&&!sbsActive){unlockSessionMusic();setExploreMode(!exploreActive)}
     this.gamepadTogglePressed=togglePressed
-    if(!exploreActive||sbsActive||$('#visit-panorama'))return
+    if(!exploreActive||sbsActive)return
     let x=this.stick.x,y=-this.stick.y
     const deadzone=value=>Math.abs(value||0)>.16?value:0
     if(gamepad){x+=deadzone(gamepad.axes?.[0]);y-=deadzone(gamepad.axes?.[1]);const lookX=deadzone(gamepad.axes?.[2]),lookY=deadzone(gamepad.axes?.[3]);const controls=$('#camera')?.components?.['look-controls'];if(controls?.yawObject&&controls?.pitchObject){controls.yawObject.rotation.y-=lookX*delta*.0022;controls.pitchObject.rotation.x=Math.max(-Math.PI/2,Math.min(Math.PI/2,controls.pitchObject.rotation.x-lookY*delta*.0018))}}
@@ -223,7 +224,8 @@ AFRAME.registerComponent('museum-explorer',{
     const right=new THREE.Vector3(1,0,0).applyQuaternion(worldRotation);right.y=0;right.normalize()
     const direction=forward.multiplyScalar(y).add(right.multiplyScalar(x));if(direction.lengthSq()>1)direction.normalize()
     const position=this.el.object3D.position.clone().addScaledVector(direction,this.speed*Math.min(delta,50)/1000)
-    const horizontal=new THREE.Vector2(position.x,position.z);if(horizontal.length()>9.25){horizontal.setLength(9.25);position.x=horizontal.x;position.z=horizontal.y}
+    const movementLimit=$('#visit-panorama')?2.8:9.25
+    const horizontal=new THREE.Vector2(position.x,position.z);if(horizontal.length()>movementLimit){horizontal.setLength(movementLimit);position.x=horizontal.x;position.z=horizontal.y}
     position.y=1.65;this.el.object3D.position.copy(position)
   },
   remove(){window.removeEventListener('keydown',this.keyDown);window.removeEventListener('keyup',this.keyUp)}
@@ -305,6 +307,8 @@ function hideMuseumForExperience(root){
 function enterPanorama(panorama){
   if($('#visit-panorama'))return
   const scene=$('a-scene'),rig=$('#rig'),sky=make('a-sky',{id:'visit-panorama',src:assetPath(panorama),radius:'45',rotation:'0 -90 0',material:'shader:flat;side:back'})
+  experienceReturnPosition=rig.object3D.position.clone()
+  rig.object3D.position.set(0,1.65,0)
   Array.from(scene.children).forEach(element=>{
     if(element===rig||element.id==='experience-exit'||element.tagName==='A-ASSETS')return
     element.dataset.visitVisibility=String(element.getAttribute('visible')!==false)
@@ -329,6 +333,7 @@ function exitPanorama(){
   $('#visit-panorama')?.remove()
   $('#visit-guide')?.remove()
   const scene=$('a-scene'),rig=$('#rig')
+  if(experienceReturnPosition){rig.object3D.position.copy(experienceReturnPosition);experienceReturnPosition=null}
   Array.from(scene.children).forEach(element=>{
     if(element===rig||element.tagName==='A-ASSETS'||element.id==='visit-panorama')return
     if(element.dataset.visitVisibility!==undefined){element.setAttribute('visible',element.dataset.visitVisibility==='true');delete element.dataset.visitVisibility}
