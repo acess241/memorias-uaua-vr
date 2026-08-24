@@ -211,7 +211,7 @@ AFRAME.registerComponent('museum-explorer',{
     if(!exploreActive||sbsActive||$('#visit-panorama'))return
     let x=this.stick.x,y=-this.stick.y
     const deadzone=value=>Math.abs(value||0)>.16?value:0
-    if(gamepad){x+=deadzone(gamepad.axes?.[0]);y-=deadzone(gamepad.axes?.[1]);const lookX=deadzone(gamepad.axes?.[2]),lookY=deadzone(gamepad.axes?.[3]);const controls=$('#camera')?.components?.['look-controls'];if(controls?.yawObject&&controls?.pitchObject){controls.yawObject.rotation.y-=lookX*delta*.0022;controls.pitchObject.rotation.x=Math.max(-Math.PI/2,Math.min(Math.PI/2,controls.pitchObject.rotation.x-lookY*delta*.0018))}}
+    if(gamepad){x+=deadzone(gamepad.axes?.[0]);y+=deadzone(gamepad.axes?.[1]);const lookX=deadzone(gamepad.axes?.[2]),lookY=deadzone(gamepad.axes?.[3]);const controls=$('#camera')?.components?.['look-controls'];if(controls?.yawObject&&controls?.pitchObject){controls.yawObject.rotation.y-=lookX*delta*.0022;controls.pitchObject.rotation.x=Math.max(-Math.PI/2,Math.min(Math.PI/2,controls.pitchObject.rotation.x-lookY*delta*.0018))}}
     if(this.keys.has('KeyW')||this.keys.has('ArrowUp'))y+=1
     if(this.keys.has('KeyS')||this.keys.has('ArrowDown'))y-=1
     if(this.keys.has('KeyD')||this.keys.has('ArrowRight'))x+=1
@@ -222,7 +222,7 @@ AFRAME.registerComponent('museum-explorer',{
     const right=new THREE.Vector3(1,0,0).applyQuaternion(camera.quaternion);right.y=0;right.normalize()
     const direction=forward.multiplyScalar(y).add(right.multiplyScalar(x));if(direction.lengthSq()>1)direction.normalize()
     const position=this.el.object3D.position.clone().addScaledVector(direction,this.speed*Math.min(delta,50)/1000)
-    const horizontal=new THREE.Vector2(position.x,position.z);if(horizontal.length()>18){horizontal.setLength(18);position.x=horizontal.x;position.z=horizontal.y}
+    const horizontal=new THREE.Vector2(position.x,position.z);if(horizontal.length()>9.25){horizontal.setLength(9.25);position.x=horizontal.x;position.z=horizontal.y}
     position.y=1.65;this.el.object3D.position.copy(position)
   },
   remove(){window.removeEventListener('keydown',this.keyDown);window.removeEventListener('keyup',this.keyUp)}
